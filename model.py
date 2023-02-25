@@ -20,7 +20,7 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
     x = DenseNet121(input_shape=input_shape, weights=weights,
                     include_top=False, pooling='avg')(inputs)
     x = Dropout(dropout)(x)
-    predictions = Dense(22, activation='softmax')(x)
+    predictions = Dense(226, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
 
     # setup the metrics
@@ -43,7 +43,7 @@ def build_mobilenetv2_model(input_shape=[None, 128, 3], dropout=0,
     x = MobileNetV2(input_shape=input_shape, weights=weights,
                     include_top=False, pooling="avg")(inputs)
     x = Dropout(dropout)(x)
-    predictions = Dense(22, activation='softmax')(x)
+    predictions = Dense(226, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
 
     # setup the metrics
@@ -66,7 +66,7 @@ def build_nasnetmobile_model(input_shape=[None, 128, 3], dropout=0,
     x = NASNetMobile(input_shape=input_shape, weights=weights,
                      include_top=False, pooling="avg")(inputs)
     x = Dropout(dropout)(x)
-    predictions = Dense(22, activation='softmax')(x)
+    predictions = Dense(226, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
 
     # setup the metrics
@@ -90,7 +90,7 @@ def build_efficientnet_model(input_shape=[None, 128, 3], dropout=0,
     x = EfficientNetB0(input_shape=input_shape, weights=weights,
                      include_top=False, pooling="avg")(inputs)
     x = Dropout(dropout)(x)
-    predictions = Dense(22, activation='softmax')(x)
+    predictions = Dense(226, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
 
     # setup the metrics
