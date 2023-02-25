@@ -166,7 +166,7 @@ def generate_train_dataset(dataset,
                            buffer_size=5000,
                            deterministic=False):
     # convert label(s) to onehot
-    ds = dataset.map(label_to_one_hot)
+    ds = dataset.map(label_to_one_hot).cache()
 
     # shuffle, map and batch dataset
     if deterministic:
