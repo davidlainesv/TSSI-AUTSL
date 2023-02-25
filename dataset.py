@@ -251,7 +251,7 @@ class Dataset():
         self.num_val_examples = num_val_examples
         self.num_test_examples = num_test_examples
         self.num_total_examples = num_total_examples
-        self.input_width = [None, 135, 3]#info.features['pose'].shape[1]
+        self.input_width = info.features['pose'].shape[1]
 
     def get_training_set(self,
                          batch_size=32,
