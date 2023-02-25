@@ -5,7 +5,7 @@ from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMore
 import tensorflow_datasets as tfds
 
 AugmentationDict = {
-    'speed': RandomSpeed(min_frames=21, max_frames=156, seed=5),
+    'speed': RandomSpeed(min_frames=60, max_frames=MIN_INPUT_HEIGHT, seed=5),
     'rotation': RandomRotation(factor=15.0, min_value=0.0, max_value=1.0, seed=4),
     'flip': RandomFlip("horizontal", min_value=0.0, max_value=1.0, seed=3),
     'scale': RandomScale(min_value=0.0, max_value=1.0, seed=1),
