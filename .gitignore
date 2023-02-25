@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Wandb
+wandb/
+
+# notes
+commands.txt
