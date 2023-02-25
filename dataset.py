@@ -240,7 +240,8 @@ def build_normalization_pipeline(normalization):
 class Dataset():
     def __init__(self):
         # obtain characteristics of the dataset
-        ds, info = tfds.load('autsl_tssi', data_dir="~/tfds_datasets", with_info=True)
+        # ds, info = tfds.load('autsl_tssi', data_dir="~/tfds_datasets", with_info=True)
+        ds = tf.data.Dataset.load("~/tfds_datasets/autsl_tssi")
         num_train_examples = ds["train"].cardinality()
         num_val_examples = ds["validation"].cardinality()
         num_test_examples = ds["test"].cardinality()
@@ -251,7 +252,7 @@ class Dataset():
         self.num_val_examples = num_val_examples
         self.num_test_examples = num_test_examples
         self.num_total_examples = num_total_examples
-        self.input_width = info.features['pose'].shape[1]
+        self.input_width = [None, 135, 3]#info.features['pose'].shape[1]
 
     def get_training_set(self,
                          batch_size=32,
