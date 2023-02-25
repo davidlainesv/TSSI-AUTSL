@@ -20,9 +20,12 @@ NormalizationDict = {
     'test_resize': ResizeIfMoreThan(frames=MAX_INPUT_HEIGHT),
     'pad': PadIfLessThan(frames=MIN_INPUT_HEIGHT),
     'angle': FillBlueWithAngle(x_channel=0, y_channel=1, scale_to=[0, 1]),
+    'norm_imagenet': tf.keras.layers.Normalization(axis=-1,
+                                                   mean=[0.485, 0.456, 0.406],
+                                                   variance=[0.052441, 0.050176, 0.050625]),
     'norm': tf.keras.layers.Normalization(axis=-1,
-                                          mean=[0.485, 0.456, 0.406],
-                                          variance=[0.052441, 0.050176, 0.050625])
+                                          mean=[248.08896, 246.56985, 0.],
+                                          variance=[9022.948, 17438.518, 0.])
 }
 
 # default_augmentation_order = ['speed', 'rotation', 'flip', 'scale', 'shift']
@@ -255,6 +258,9 @@ class Dataset():
         num_test_examples = ds["test"].cardinality()
         num_total_examples = num_train_examples + num_val_examples + num_test_examples
 
+        # self.norm = tf.keras.layers.Normalization(axis=-1)
+        # self.norm.adapt(ds["train"].map(lambda item: item["pose"]))
+
         self.ds = ds
         self.num_train_examples = num_train_examples
         self.num_val_examples = num_val_examples
@@ -292,6 +298,7 @@ class Dataset():
             return x, y
         
         train_ds = self.ds["train"]
+        train_ds = self.norm(train_ds)
 
         dataset = generate_train_dataset(train_ds,
                                          train_map_fn,
@@ -321,6 +328,7 @@ class Dataset():
             return batch_x, batch_y
         
         val_ds = self.ds["validation"]
+        val_ds = self.norm(val_ds)
 
         dataset = generate_test_dataset(val_ds,
                                         test_map_fn,
