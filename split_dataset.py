@@ -29,7 +29,7 @@ class SplitDataset():
 
         # obtain characteristics of the dataset
         num_total_examples = len(main_dataframe["video"].unique())
-        labels = main_dataframe.groupby("video")["label"].unique().tolist()
+        labels = main_dataframe.groupby("video")["gloss_id"].unique().tolist()
 
         # generate k-fold cross validator
         skf = StratifiedKFold(num_splits, shuffle=True,
