@@ -3,6 +3,7 @@ from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT
 from data_augmentation import RandomFlip, RandomScale, RandomShift, RandomRotation, RandomSpeed
 from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, TranslationScaleInvariant, preprocess_dataframe
 import tensorflow_datasets as tfds
+import autsl_tssi
 
 AugmentationDict = {
     'speed': RandomSpeed(min_frames=60, max_frames=MIN_INPUT_HEIGHT, seed=5),
@@ -240,8 +241,7 @@ def build_normalization_pipeline(normalization):
 class Dataset():
     def __init__(self):
         # obtain characteristics of the dataset
-        # ds, info = tfds.load('autsl_tssi', data_dir="~/tfds_datasets", with_info=True)
-        ds = tf.data.Dataset.load("~/tfds_datasets/autsl_tssi")
+        ds, info = tfds.load('autsl_tssi', data_dir="datasets", with_info=True)
         num_train_examples = ds["train"].cardinality()
         num_val_examples = ds["validation"].cardinality()
         num_test_examples = ds["test"].cardinality()
