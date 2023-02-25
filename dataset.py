@@ -298,7 +298,7 @@ class Dataset():
             return x, y
         
         train_ds = self.ds["train"]
-        train_ds = self.norm(train_ds)
+        # train_ds = self.norm(train_ds)
 
         dataset = generate_train_dataset(train_ds,
                                          train_map_fn,
@@ -328,7 +328,7 @@ class Dataset():
             return batch_x, batch_y
         
         val_ds = self.ds["validation"]
-        val_ds = self.norm(val_ds)
+        # val_ds = self.norm(val_ds)
 
         dataset = generate_test_dataset(val_ds,
                                         test_map_fn,
