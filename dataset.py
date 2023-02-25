@@ -1,5 +1,5 @@
 import tensorflow as tf
-from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT
+from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT, NUM_CLASSES
 from data_augmentation import RandomFlip, RandomScale, RandomShift, RandomRotation, RandomSpeed
 from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, TranslationScaleInvariant, preprocess_dataframe
 import tensorflow_datasets as tfds
@@ -158,7 +158,7 @@ PipelineDict = {
 def label_to_one_hot(item):
   pose = item["pose"]
   label = item["gloss_id"]
-  one_hot_label = tf.one_hot(label, 22)
+  one_hot_label = tf.one_hot(label, NUM_CLASSES)
   return pose, one_hot_label
 
 
