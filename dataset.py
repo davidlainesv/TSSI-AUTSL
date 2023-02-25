@@ -195,9 +195,18 @@ def generate_test_dataset(dataset,
     # convert label(s) to onehot
     ds = dataset.map(label_to_one_hot)
 
+    # batch dataset
+    max_element_length = 200
+    bucket_boundaries = list(range(1, max_element_length))
+    bucket_batch_sizes = [batch_size] * max_element_length
+    ds = ds.bucket_by_sequence_length(
+        element_length_func=lambda x, y: tf.shape(x)[0],
+        bucket_boundaries=bucket_boundaries,
+        bucket_batch_sizes=bucket_batch_sizes,
+        no_padding=True)
+
     # map dataset
     dataset = ds \
-        .batch(batch_size) \
         .map(test_map_fn,
              num_parallel_calls=tf.data.AUTOTUNE,
              deterministic=False) \
