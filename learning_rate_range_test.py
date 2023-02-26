@@ -1,19 +1,14 @@
 import argparse
 from config import LRRT_STOP_FACTOR, RANDOM_SEED
 from callbacks import LearningRateVsLossCallback
+from dataset import Dataset
 import numpy as np
 import wandb
 import tensorflow as tf
-import pandas as pd
 from model import build_densenet121_model, build_efficientnet_model, build_mobilenetv2_model
 from optimizer import build_sgd_optimizer
-from split_dataset import SplitDataset
 
-# Load data
-train_dataframe = pd.read_csv("wlasl100_skeletons_train.csv", index_col=0)
-validation_dataframe = pd.read_csv("wlasl100_skeletons_val.csv", index_col=0)
-dataset = SplitDataset(train_dataframe, validation_dataframe, num_splits=5)
-del train_dataframe, validation_dataframe
+dataset = Dataset()
 
 
 def run_experiment(config=None, log_to_wandb=True, verbose=0):
@@ -28,7 +23,6 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
 
     # generate train dataset
     train_dataset = dataset.get_training_set(
-        split=config['split'],
         batch_size=config['batch_size'],
         buffer_size=dataset.num_train_examples,
         repeat=True,
@@ -38,7 +32,6 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
 
     # generate val dataset
     validation_dataset = dataset.get_validation_set(
-        split=config['split'],
         batch_size=config['batch_size'],
         pipeline=config['pipeline'])
 
@@ -120,20 +113,21 @@ def main(args):
     entity = args.entity
     project = args.project
     sweep_id = args.sweep_id
+
     wandb.agent(sweep_id, project=project, entity=entity, function=agent_fn)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Learning rate range test cv.')
+        description='Learning rate range test')
     parser.add_argument('--entity',
                         type=str,
                         help='Entity',
-                        default='cv_inside')
+                        default='davidlaines')
     parser.add_argument('--project',
                         type=str,
                         help='Project name',
-                        default='lrrt-wlasl100-tssi')
+                        default='autls-tssi-lrrt')
     parser.add_argument('--sweep_id',
                         type=str,
                         help='Sweep id',
