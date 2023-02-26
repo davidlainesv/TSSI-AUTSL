@@ -127,7 +127,7 @@ if __name__ == "__main__":
     parser.add_argument('--project',
                         type=str,
                         help='Project name',
-                        default='autls-tssi-lrrt')
+                        default='autsl-tssi-lrrt')
     parser.add_argument('--sweep_id',
                         type=str,
                         help='Sweep id',
