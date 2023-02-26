@@ -341,14 +341,12 @@ class Dataset():
 
     def get_testing_set(self,
                         batch_size=32,
-                        normalization=None,
-                        pipeline=None):
-        if self.test_dataframe is None:
-            return None
-
+                        pipeline="default"):
         # define normalization pipeline
         if type(pipeline) is str:
             normalization = PipelineDict[pipeline]['test_normalization']
+        else:
+            raise Exception("Pipeline not provided")
         normalization_pipeline = build_normalization_pipeline(normalization)
 
         # define the val map function
