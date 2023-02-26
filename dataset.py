@@ -1,7 +1,7 @@
 import tensorflow as tf
 from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT, NUM_CLASSES
 from data_augmentation import RandomFlip, RandomScale, RandomShift, RandomRotation, RandomSpeed
-from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, TranslationScaleInvariant, preprocess_dataframe
+from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, TranslationScaleInvariant
 import tensorflow_datasets as tfds
 
 AugmentationDict = {
