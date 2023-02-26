@@ -74,7 +74,7 @@ PipelineDict = {
 
     'invariant_frame': {
         'augmentation': ['speed', 'rotation', 'flip'],
-        'train_normalization': ['invariant_frame', 'pad'],
+        'train_normalization': ['train_resize', 'invariant_frame', 'pad'],
         'test_normalization': ['test_resize', 'invariant_frame', 'pad']
     },
     'invariant_joint': {
