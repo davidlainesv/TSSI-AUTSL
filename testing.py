@@ -35,7 +35,8 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
         repeat=False,
         deterministic=True,
         augmentation=config['augmentation'],
-        pipeline=config['pipeline'])
+        pipeline=config['pipeline'],
+        concatenate_validation=True)
 
     # generate val dataset
     validation_dataset = dataset.get_testing_set(

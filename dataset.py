@@ -274,7 +274,8 @@ class Dataset():
                          repeat=False,
                          deterministic=False,
                          augmentation=True,
-                         pipeline="default"):
+                         pipeline="default",
+                         concatenate_validation=False):
         # define pipeline
         if type(pipeline) is str:
             augmentation_layers = PipelineDict[pipeline]['augmentation'] \
@@ -298,6 +299,8 @@ class Dataset():
             return x, y
         
         train_ds = self.ds["train"]
+        if concatenate_validation:
+            train_ds = train_ds.concatenate(self.ds["validation"])
         # train_ds = self.norm(train_ds)
 
         dataset = generate_train_dataset(train_ds,
