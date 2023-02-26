@@ -105,7 +105,8 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
 
 
 def agent_fn(config, project, entity, verbose=0):
-    wandb.init(entity=entity, project=project, config=config, reinit=True)
+    wandb.init(entity=entity, project=project, config=config,
+               reinit=True, settings=wandb.Settings(code_dir="."))
     _ = run_experiment(config=wandb.config, log_to_wandb=True, verbose=verbose)
     wandb.finish()
 
