@@ -88,13 +88,13 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     logs = lrc.get_logs()
 
     return logs
-
+import traceback
 
 def agent_fn(config=None):
     wandb.init(config=config, reinit=True, settings=wandb.Settings(code_dir="."))
 
-    maximal_learning_rate = float(wandb.config.maximal_learning_rate)
-    initial_learning_rate = float(wandb.config.initial_learning_rate)
+    initial_learning_rate = wandb.config.initial_learning_rate
+    maximal_learning_rate = wandb.config.maximal_learning_rate
     learning_rate_delta = wandb.config.learning_rate_delta
     batch_size = wandb.config.batch_size
 
@@ -108,6 +108,7 @@ def agent_fn(config=None):
     try:
         _ = run_experiment(config=wandb.config, log_to_wandb=True, verbose=0)
     except Exception as inst:
+        traceback.print_exc()
         print(inst)
     return
     wandb.finish()
