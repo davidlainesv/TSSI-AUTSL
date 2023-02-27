@@ -22,11 +22,12 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     print("[INFO] Configuration:", config, "\n")
 
     # generate train dataset
+    deterministic = config['augmentation']
     train_dataset = dataset.get_training_set(
         batch_size=config['batch_size'],
         buffer_size=dataset.num_train_examples,
         repeat=True,
-        deterministic=True,
+        deterministic=deterministic,
         augmentation=config['augmentation'],
         pipeline=config['pipeline'])
 
