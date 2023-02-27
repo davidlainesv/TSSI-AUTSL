@@ -23,7 +23,7 @@ NormalizationDict = {
     'norm_imagenet': tf.keras.layers.Normalization(axis=-1,
                                                    mean=[0.485, 0.456, 0.406],
                                                    variance=[0.052441, 0.050176, 0.050625]),
-    # placeholder for norm, mean and variance are obtained dinamically 
+    # placeholder for norm, mean and variance are obtained dinamically
     'norm': tf.keras.layers.Normalization(axis=-1,
                                           mean=[248.08896, 246.56985, 0.],
                                           variance=[9022.948, 17438.518, 0.])
@@ -156,11 +156,12 @@ PipelineDict = {
 }
 
 
+@tf.function
 def label_to_one_hot(item):
-  pose = item["pose"]
-  label = item["gloss_id"]
-  one_hot_label = tf.one_hot(label, NUM_CLASSES)
-  return pose, one_hot_label
+    pose = item["pose"]
+    label = item["gloss_id"]
+    one_hot_label = tf.one_hot(label, NUM_CLASSES)
+    return pose, one_hot_label
 
 
 def generate_train_dataset(dataset,
@@ -250,6 +251,11 @@ def build_normalization_pipeline(normalization):
     return pipeline
 
 
+@tf.function
+def extract_pose(item):
+    return item["pose"]
+
+
 class Dataset():
     def __init__(self, concat_validation_to_train=False):
         global NormalizationDict
@@ -263,9 +269,8 @@ class Dataset():
 
         # generate norm layer
         norm = tf.keras.layers.Normalization(axis=-1)
-        norm.adapt(ds["train"].map(
-            lambda item: item["pose"],
-            num_parallel_calls=tf.data.AUTOTUNE))
+        norm.adapt(ds["train"].map(extract_pose,
+                                   num_parallel_calls=tf.data.AUTOTUNE))
         NormalizationDict["norm"] = norm
 
         # obtain characteristics of the dataset
@@ -309,7 +314,7 @@ class Dataset():
             x = tf.ensure_shape(
                 batch[0], [MIN_INPUT_HEIGHT, self.input_width, 3])
             return x, y
-        
+
         train_ds = self.ds["train"]
 
         dataset = generate_train_dataset(train_ds,
@@ -337,7 +342,7 @@ class Dataset():
         def test_map_fn(batch_x, batch_y):
             batch_x = normalization_pipeline(batch_x)
             return batch_x, batch_y
-        
+
         val_ds = self.ds["validation"]
 
         dataset = generate_test_dataset(val_ds,
@@ -361,7 +366,7 @@ class Dataset():
         def test_map_fn(batch_x, batch_y):
             batch_x = normalization_pipeline(batch_x)
             return batch_x, batch_y
-        
+
         test_ds = self.ds["test"]
 
         dataset = generate_test_dataset(test_ds,
