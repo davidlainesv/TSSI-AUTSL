@@ -105,8 +105,11 @@ def agent_fn(config=None):
     update = {"step_size": step_size, "log_each_steps": log_each_steps}
     wandb.config.update(update)
 
-    _ = run_experiment(config=wandb.config, log_to_wandb=True, verbose=0)
-
+    try:
+        _ = run_experiment(config=wandb.config, log_to_wandb=True, verbose=0)
+    except Exception as inst:
+        print(inst)
+    return
     wandb.finish()
 
 
