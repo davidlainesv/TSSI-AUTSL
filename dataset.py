@@ -264,8 +264,8 @@ class Dataset():
         # generate norm layer
         norm = tf.keras.layers.Normalization(axis=-1)
         norm.adapt(ds["train"].map(
-            lambda item: item["pose"]),
-            num_parallel_calls=tf.data.AUTOTUNE)
+            lambda item: item["pose"],
+            num_parallel_calls=tf.data.AUTOTUNE))
         NormalizationDict["norm"] = norm
 
         # obtain characteristics of the dataset
