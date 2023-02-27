@@ -7,6 +7,7 @@ import wandb
 import tensorflow as tf
 from model import build_densenet121_model, build_efficientnet_model, build_mobilenetv2_model
 from optimizer import build_sgd_optimizer
+import traceback
 
 dataset = Dataset()
 
@@ -104,11 +105,10 @@ def agent_fn(config=None):
     update = {"step_size": step_size, "log_each_steps": log_each_steps}
     wandb.config.update(update)
 
-    # try:
-    #     _ = run_experiment(config=wandb.config, log_to_wandb=True, verbose=0)
-    # except Exception as inst:
-    #     traceback.print_exc()
-    #     print(inst)
+    try:
+        _ = run_experiment(config=wandb.config, log_to_wandb=True, verbose=0)
+    except Exception as inst:
+        traceback.print_exc()
 
     wandb.finish()
 
