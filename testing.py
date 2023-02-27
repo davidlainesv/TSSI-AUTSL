@@ -44,8 +44,9 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
         pipeline=config['pipeline'])
 
     print("[INFO] Dataset Total examples:", dataset.num_total_examples)
-    print("[INFO] Dataset Training examples:", dataset.num_train_examples)
-    print("[INFO] Dataset Training examples:", dataset.num_val_examples)
+    print("[INFO] Dataset Training examples:", dataset.num_train_examples \
+          + dataset.num_val_examples)
+    print("[INFO] Dataset Testing examples:", dataset.num_test_examples)
 
     # setup optimizer
     optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
