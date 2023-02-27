@@ -29,11 +29,12 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
         raise Exception("Dataset not provided.")
 
     # generate train dataset
+    deterministic = config['augmentation']
     train_dataset = dataset.get_training_set(
         batch_size=config['batch_size'],
         buffer_size=dataset.num_train_examples,
         repeat=False,
-        deterministic=True,
+        deterministic=deterministic,
         augmentation=config['augmentation'],
         pipeline=config['pipeline'],
         concatenate_validation=True)
