@@ -36,8 +36,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
         repeat=False,
         deterministic=deterministic,
         augmentation=config['augmentation'],
-        pipeline=config['pipeline'],
-        concatenate_validation=True)
+        pipeline=config['pipeline'])
 
     # generate val dataset
     validation_dataset = dataset.get_testing_set(
@@ -131,7 +130,7 @@ def main(args):
     pipeline = args.pipeline
     save_freq = args.save_freq
 
-    dataset = Dataset()
+    dataset = Dataset(concatenate_validation=True)
 
     steps_per_epoch = np.ceil(dataset.num_train_examples / batch_size)
 

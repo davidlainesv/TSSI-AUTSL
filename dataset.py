@@ -23,6 +23,7 @@ NormalizationDict = {
     'norm_imagenet': tf.keras.layers.Normalization(axis=-1,
                                                    mean=[0.485, 0.456, 0.406],
                                                    variance=[0.052441, 0.050176, 0.050625]),
+    # placeholder for norm, mean and variance are obtained dinamically 
     'norm': tf.keras.layers.Normalization(axis=-1,
                                           mean=[248.08896, 246.56985, 0.],
                                           variance=[9022.948, 17438.518, 0.])
@@ -250,16 +251,28 @@ def build_normalization_pipeline(normalization):
 
 
 class Dataset():
-    def __init__(self):
-        # obtain characteristics of the dataset
+    def __init__(self, concat_validation_to_train=False):
+        global NormalizationDict
+
+        # obtain dataset
         ds, info = tfds.load('autsl_tssi', data_dir="datasets", with_info=True)
+
+        # generate train dataset
+        if concat_validation_to_train:
+            ds["train"] = ds["train"].concatenate(ds["validation"])
+
+        # generate norm layer
+        norm = tf.keras.layers.Normalization(axis=-1)
+        norm.adapt(ds["train"].map(
+            lambda item: item["pose"]),
+            num_parallel_calls=tf.data.AUTOTUNE)
+        NormalizationDict["norm"] = norm
+
+        # obtain characteristics of the dataset
         num_train_examples = ds["train"].cardinality()
         num_val_examples = ds["validation"].cardinality()
         num_test_examples = ds["test"].cardinality()
         num_total_examples = num_train_examples + num_val_examples + num_test_examples
-
-        # self.norm = tf.keras.layers.Normalization(axis=-1)
-        # self.norm.adapt(ds["train"].map(lambda item: item["pose"]))
 
         self.ds = ds
         self.num_train_examples = num_train_examples
@@ -274,8 +287,7 @@ class Dataset():
                          repeat=False,
                          deterministic=False,
                          augmentation=True,
-                         pipeline="default",
-                         concatenate_validation=False):
+                         pipeline="default"):
         # define pipeline
         if type(pipeline) is str:
             augmentation_layers = PipelineDict[pipeline]['augmentation'] \
@@ -299,9 +311,6 @@ class Dataset():
             return x, y
         
         train_ds = self.ds["train"]
-        if concatenate_validation:
-            train_ds = train_ds.concatenate(self.ds["validation"])
-        # train_ds = self.norm(train_ds)
 
         dataset = generate_train_dataset(train_ds,
                                          train_map_fn,
@@ -326,12 +335,10 @@ class Dataset():
         # define the val map function
         @tf.function
         def test_map_fn(batch_x, batch_y):
-            # batch_x = batch_x.to_tensor()
             batch_x = normalization_pipeline(batch_x)
             return batch_x, batch_y
         
         val_ds = self.ds["validation"]
-        # val_ds = self.norm(val_ds)
 
         dataset = generate_test_dataset(val_ds,
                                         test_map_fn,
@@ -352,7 +359,6 @@ class Dataset():
         # define the val map function
         @tf.function
         def test_map_fn(batch_x, batch_y):
-            # batch_x = batch_x.to_tensor()
             batch_x = normalization_pipeline(batch_x)
             return batch_x, batch_y
         
