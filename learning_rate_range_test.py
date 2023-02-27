@@ -88,7 +88,6 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     logs = lrc.get_logs()
 
     return logs
-import traceback
 
 def agent_fn(config=None):
     wandb.init(config=config, reinit=True, settings=wandb.Settings(code_dir="."))
@@ -105,12 +104,12 @@ def agent_fn(config=None):
     update = {"step_size": step_size, "log_each_steps": log_each_steps}
     wandb.config.update(update)
 
-    try:
-        _ = run_experiment(config=wandb.config, log_to_wandb=True, verbose=0)
-    except Exception as inst:
-        traceback.print_exc()
-        print(inst)
-    return
+    # try:
+    #     _ = run_experiment(config=wandb.config, log_to_wandb=True, verbose=0)
+    # except Exception as inst:
+    #     traceback.print_exc()
+    #     print(inst)
+
     wandb.finish()
 
 
