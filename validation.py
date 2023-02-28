@@ -101,7 +101,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
                                     maximal_learning_rate=config['initial_learning_rate'],
                                     momentum=config['momentum'],
                                     nesterov=config['nesterov'],
-                                    step_size=config['step_size'],
+                                    step_size=step_size,
                                     weight_decay=config['weight_decay'])
     model.fit(train_dataset,
               epochs=extra_epochs,
