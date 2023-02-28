@@ -100,7 +100,7 @@ PipelineDict = {
         'test': ['test_resize', 'pad', 'norm']
     },
     'default_scale_norm': {
-        'train': ['scale_to_01', 'random_speed', 'train_resize', 'pad', 'norm_imagenet'],
+        'train': ['random_speed', 'scale_to_01', 'train_resize', 'pad', 'norm_imagenet'],
         'test': ['scale_to_01', 'test_resize', 'pad', 'norm_imagenet']
     },
     'invariant_frame': {
