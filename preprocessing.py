@@ -186,8 +186,12 @@ class ScaleTo01(tf.keras.layers.Layer):
         green_min = tf.reduce_min(green, axis=[-1, -2], keepdims=True)
 
         # shape = [examples, 1, 1]
-        red_offset = tf.cond(red_min < 0, lambda: red_min, lambda: 0)
-        green_offset = tf.cond(green_min < 0, lambda: green_min, lambda: 0)
+        red_offset = tf.cond(red_min < 0,
+                             lambda: red_min,
+                             lambda: tf.constant([[[0]]]))
+        green_offset = tf.cond(green_min < 0,
+                               lambda: green_min,
+                               lambda: tf.constant([[[0]]]))
 
         # shape = [examples, frames, joints]
         new_red = red - red_offset
