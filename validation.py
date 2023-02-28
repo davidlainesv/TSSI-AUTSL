@@ -93,6 +93,22 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
               validation_data=validation_dataset,
               callbacks=callbacks)
 
+    # train for a few more epochs
+    extra_epochs = 10
+    step_size = np.ceil(dataset.num_train_examples /
+                        config["batch_size"]) * extra_epochs
+    optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
+                                    maximal_learning_rate=config['initial_learning_rate'],
+                                    momentum=config['momentum'],
+                                    nesterov=config['nesterov'],
+                                    step_size=config['step_size'],
+                                    weight_decay=config['weight_decay'])
+    model.fit(train_dataset,
+              epochs=extra_epochs,
+              verbose=verbose,
+              validation_data=validation_dataset,
+              callbacks=callbacks)
+
     # get the logs of the model
     return model.history
 
@@ -119,7 +135,7 @@ def main(args):
     batch_size = args.batch_size
     num_epochs = args.num_epochs
     pipeline = args.pipeline
-    
+
     dataset = Dataset()
 
     steps_per_epoch = np.ceil(dataset.num_train_examples / batch_size)
