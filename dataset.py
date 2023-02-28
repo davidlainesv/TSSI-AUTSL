@@ -106,6 +106,10 @@ PipelineDict = {
     'invariant_frame': {
         'train': ['random_speed', 'train_resize', 'invariant_frame', 'pad'],
         'test': ['test_resize', 'invariant_frame', 'pad']
+    },
+    'invariant_frame_norm': {
+        'train': ['random_speed', 'train_resize', 'invariant_frame', 'pad', 'norm_imagenet'],
+        'test': ['test_resize', 'invariant_frame', 'pad', 'norm_imagenet']
     }
 }
 
@@ -211,7 +215,7 @@ class Dataset():
         norm = tf.keras.layers.Normalization(axis=-1)
         norm.adapt(ds["train"].map(extract_pose,
                                    num_parallel_calls=tf.data.AUTOTUNE))
-        NormalizationDict["norm"]["layer"] = norm
+        LayerDict["norm"]["layer"] = norm
 
         # obtain characteristics of the dataset
         num_train_examples = ds["train"].cardinality()
