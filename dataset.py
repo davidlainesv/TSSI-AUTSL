@@ -191,7 +191,7 @@ def build_pipeline(pipeline, exclude_augmentation=False, split="train"):
         items = [LayerDict[name] for name in PipelineDict[pipeline][split]]
         if exclude_augmentation:
             layers = [item["layer"] for item in items if
-                      item["type"] == LayerType.Augmentation]
+                      item["type"] != LayerType.Augmentation]
         layers = [item["layer"] for item in items]
     else:
         raise Exception("Pipeline " +
