@@ -181,25 +181,22 @@ class ScaleTo01(tf.keras.layers.Layer):
         # shape = [examples, frames, joints]
         [red, green, blue] = tf.unstack(batch, axis=-1)
 
-        # shape = [examples, frames, joints]
+        # shape = [examples, 1, 1]
         red_min = tf.reduce_min(red, axis=[-1, -2], keepdims=True)
         green_min = tf.reduce_min(green, axis=[-1, -2], keepdims=True)
 
-        # shape = [examples, 1, 1]
-        red_offset = tf.cond(red_min < 0,
-                             lambda: red_min,
-                             lambda: tf.constant([[[0.]]]))
-        green_offset = tf.cond(green_min < 0,
-                               lambda: green_min,
-                               lambda: tf.constant([[[0.]]]))
-
         # shape = [examples, frames, joints]
-        new_red = red - red_offset
-        new_green = green - green_offset
+        red_shifted = tf.cond(red_min < 0,
+                              lambda: red - red_min,
+                              lambda: red)
+        green_shifted = tf.cond(green_min < 0,
+                                lambda: green - green_min,
+                                lambda: green)
 
         # shape = [examples, 1, 1]
-        red_factor = tf.reduce_max(new_red, axis=[-1, -2], keepdims=True)
-        green_factor = tf.reduce_max(new_green, axis=[-1, -2], keepdims=True)
+        red_factor = tf.reduce_max(red_shifted, axis=[-1, -2], keepdims=True)
+        green_factor = tf.reduce_max(
+            green_shifted, axis=[-1, -2], keepdims=True)
 
         # shape = (1)
         scale_factor = tf.reduce_max([red_factor, green_factor])
