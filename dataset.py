@@ -183,12 +183,12 @@ def generate_test_dataset(dataset,
     return dataset
 
 
-def build_pipeline(pipeline, exclude_augmentation=False):
+def build_pipeline(pipeline, exclude_augmentation=False, split="train"):
     # normalization: None, str or list
     if pipeline == None:
         layers = []
     elif type(pipeline) is str:
-        items = [LayerDict[name] for name in PipelineDict[pipeline]]
+        items = [LayerDict[name] for name in PipelineDict[pipeline][split]]
         if exclude_augmentation:
             items = [item["layer"] for item in items if
                      item["type"] == LayerType.Augmentation]
@@ -202,7 +202,7 @@ def build_pipeline(pipeline, exclude_augmentation=False):
 
 class Dataset():
     def __init__(self, concat_validation_to_train=False):
-        global NormalizationDict
+        global LayerDict
 
         # obtain dataset
         ds, info = tfds.load('autsl_tssi', data_dir="datasets", with_info=True)
@@ -240,7 +240,7 @@ class Dataset():
         # define pipeline
         exclude_augmentation = not augmentation
         preprocessing_pipeline = build_pipeline(
-            pipeline, exclude_augmentation)
+            pipeline, exclude_augmentation, "train")
 
         # define the train map function
         @tf.function
@@ -267,7 +267,7 @@ class Dataset():
                            pipeline="default"):
         # define pipeline
         preprocessing_pipeline = build_pipeline(
-            pipeline, exclude_augmentation=True)
+            pipeline, exclude_augmentation=True, split="test")
 
         # define the val map function
         @tf.function
@@ -288,7 +288,7 @@ class Dataset():
                         pipeline="default"):
         # define pipeline
         preprocessing_pipeline = build_pipeline(
-            pipeline, exclude_augmentation=True)
+            pipeline, exclude_augmentation=True, split="test")
 
         # define the val map function
         @tf.function
