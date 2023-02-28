@@ -295,3 +295,49 @@ class FillBlueWithAngle(tf.keras.layers.Layer):
         scaled = std * (range_max - range_min) + range_min
 
         return tf.stack([x, y, scaled], axis=-1)
+
+
+class ScaleTo01(tf.keras.layers.Layer):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @tf.function
+    def call(self, batch):
+        [red, green, blue] = tf.unstack(batch, axis=-1)
+
+        red_min = tf.reduce_min(red)
+        green_min = tf.reduce_min(green)
+
+        red_offset = tf.cond(red_min < 0, red_min, 0)
+        green_offset = tf.cond(green_min < 0, green_min, 0)
+
+        new_red = red - red_offset
+        new_green = green - green_offset
+
+        scale_factor = tf.reduce_max([new_red, new_green])
+
+        new_red = new_red / scale_factor
+        new_green = new_green / scale_factor
+
+        return tf.stack([new_red, new_green, blue], axis=-1)
+
+
+class MinMaxScaler(tf.keras.layers.Layer):
+    def __init__(self, data_min=0, data_max=100,
+                 range_min=0, range_max=1, **kwargs):
+        super().__init__(**kwargs)
+        self.data_min = data_min
+        self.data_max = data_max
+        self.range_min = range_min
+        self.range_max = range_max
+
+    @tf.function
+    def adapt(self, data):
+        self.data_min = tf.reduce_min(data)
+        self.data_max = tf.reduce_max(data)
+
+    @tf.function
+    def call(self, batch):
+        std = (batch - self.data_min) / (self.data_max - self.data_min)
+        scaled = std * (self.range_max - self.range_min) + self.range_min
+        return scaled
