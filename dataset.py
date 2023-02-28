@@ -2,7 +2,7 @@ from enum import IntEnum
 import tensorflow as tf
 from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT, NUM_CLASSES
 from data_augmentation import RandomFlip, RandomScale, RandomShift, RandomRotation, RandomSpeed
-from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, ScaleSequenceTo01, TranslationScaleInvariant
+from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, ScaleTo01, TranslationScaleInvariant
 import tensorflow_datasets as tfds
 
 
@@ -76,7 +76,7 @@ LayerDict = {
     },
     'scale_to_01': {
         'type': LayerType.Normalization,
-        'layer': ScaleSequenceTo01()
+        'layer': ScaleTo01()
     }
 }
 
