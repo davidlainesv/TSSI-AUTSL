@@ -202,7 +202,7 @@ class ScaleTo01(tf.keras.layers.Layer):
         scale_factor = tf.reduce_max([red_factor, green_factor])
 
         # shape = [examples, frames, joints]
-        new_red = new_red / scale_factor
-        new_green = new_green / scale_factor
+        new_red = red_shifted / scale_factor
+        new_green = green_shifted / scale_factor
 
         return tf.stack([new_red, new_green, blue], axis=-1)
