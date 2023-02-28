@@ -4,131 +4,6 @@ import numpy as np
 from mediapipe.python.solutions.pose import PoseLandmark
 
 
-def replace_nan_with_other_column(
-        dataframe, source_columns, target_column):
-    # array of dataframe at source_columns
-    arr = dataframe[source_columns].to_numpy()
-    # array of dataframe at target_column
-    values = dataframe[target_column].to_numpy()
-    # indices where arr is nan
-    indices = np.where(np.isnan(arr))
-    # replace nan's of arr with values
-    for i in range(indices[0].shape[0]):
-        row = indices[0][i]
-        column = indices[1][i]
-        arr[row][column] = values[row]
-    # return modified arr
-    return arr
-
-
-def preprocess_dataframe(dataframe, select_columns=[], with_root=True, with_midhip=False):
-    dataframe = dataframe.copy()
-
-    # obtain x, y columns
-    x_columns = dataframe.columns[3::2]
-    y_columns = dataframe.columns[4::2]
-
-    # columns that could have nan values
-    x_left_hand_columns = [col for col in x_columns if "leftHand" in col]
-    y_left_hand_columns = [col for col in y_columns if "leftHand" in col]
-    x_right_hand_columns = [col for col in x_columns if "rightHand" in col]
-    y_right_hand_columns = [col for col in y_columns if "rightHand" in col]
-    x_face_columns = [col for col in x_columns if "face" in col]
-    y_face_columns = [col for col in y_columns if "face" in col]
-
-    # columns with non-nan values
-    x_left_wrist_column = 'pose_' + str(int(PoseLandmark.LEFT_WRIST)) + '_x'
-    y_left_wrist_column = 'pose_' + str(int(PoseLandmark.LEFT_WRIST)) + '_y'
-    x_right_wrist_column = 'pose_' + str(int(PoseLandmark.RIGHT_WRIST)) + '_x'
-    y_right_wrist_column = 'pose_' + str(int(PoseLandmark.RIGHT_WRIST)) + '_y'
-    x_nose_column = "pose_" + str(int(PoseLandmark.NOSE)) + "_x"
-    y_nose_column = "pose_" + str(int(PoseLandmark.NOSE)) + "_y"
-
-    # add root column
-    if with_root:
-        dataframe['root_x'] = (dataframe['pose_' + str(int(PoseLandmark.LEFT_SHOULDER)) + '_x'] +
-                               dataframe['pose_' + str(int(PoseLandmark.RIGHT_SHOULDER)) + '_x']) / 2.
-        dataframe['root_y'] = (dataframe['pose_' + str(int(PoseLandmark.LEFT_SHOULDER)) + '_y'] +
-                               dataframe['pose_' + str(int(PoseLandmark.RIGHT_SHOULDER)) + '_y']) / 2.
-
-    # add midhip column
-    if with_midhip:
-        dataframe['midhip_x'] = (dataframe['pose_' + str(int(PoseLandmark.LEFT_HIP)) + '_x'] +
-                                 dataframe['pose_' + str(int(PoseLandmark.RIGHT_HIP)) + '_x']) / 2.
-        dataframe['midhip_y'] = (dataframe['pose_' + str(int(PoseLandmark.LEFT_HIP)) + '_y'] +
-                                 dataframe['pose_' + str(int(PoseLandmark.RIGHT_HIP)) + '_y']) / 2.
-
-    # # replace left hand columns with the left wrist coordinates
-    dataframe.loc[:, x_left_hand_columns] = replace_nan_with_other_column(
-        dataframe, x_left_hand_columns, x_left_wrist_column)
-    dataframe.loc[:, y_left_hand_columns] = replace_nan_with_other_column(
-        dataframe, y_left_hand_columns, y_left_wrist_column)
-
-    # # Replace right hand columns with the right wrist coordinates
-    dataframe.loc[:, x_right_hand_columns] = replace_nan_with_other_column(
-        dataframe, x_right_hand_columns, x_right_wrist_column)
-    dataframe.loc[:, y_right_hand_columns] = replace_nan_with_other_column(
-        dataframe, y_right_hand_columns, y_right_wrist_column)
-
-    # # replace face columns with the nose coordinates
-    dataframe.loc[:, x_face_columns] = replace_nan_with_other_column(
-        dataframe, x_face_columns, x_nose_column)
-    dataframe.loc[:, y_face_columns] = replace_nan_with_other_column(
-        dataframe, y_face_columns, y_nose_column)
-
-    # filter columns
-    if len(select_columns) > 0:
-        base_columns = list(dataframe.columns[:3])
-        unique_columns = list(np.unique(select_columns))
-        dataframe = dataframe.loc[:, base_columns + unique_columns]
-
-    return dataframe
-
-
-def normalize_dataframe_legacy(dataframe):
-    dataframe = dataframe.copy()
-    x_columns = dataframe.columns[3::2]
-    y_columns = dataframe.columns[4::2]
-    xy_columns = dataframe.columns[3:]
-
-    # Move in the x-axis
-    x_smaller_than_0_mask = np.any(
-        dataframe[x_columns] < 0, axis=1)
-    x_offset = dataframe.loc[x_smaller_than_0_mask, x_columns].min(
-        axis=1).abs().values[:, np.newaxis]
-    dataframe.loc[x_smaller_than_0_mask,
-                  x_columns] = dataframe.loc[x_smaller_than_0_mask, x_columns] + x_offset
-
-    # Move in the y-axis
-    y_smaller_than_0_mask = np.any(
-        dataframe[y_columns] < 0, axis=1)
-    y_offset = dataframe.loc[y_smaller_than_0_mask, y_columns].min(
-        axis=1).abs().values[:, np.newaxis]
-    dataframe.loc[y_smaller_than_0_mask,
-                  y_columns] = dataframe.loc[y_smaller_than_0_mask, y_columns] + y_offset
-
-    # Scale videos outside (0, 1) to (0, 1)
-    # out_of_scale_mask = np.any(selected_data > 1, axis=1)
-    # out_of_scale_data = selected_data[out_of_scale_mask]
-    # scales = out_of_scale_data.max(axis=1).to_numpy()[:, np.newaxis]
-    # selected_data.loc[out_of_scale_mask, :] = out_of_scale_data / scales
-
-    out_of_scale_mask = np.any(dataframe[xy_columns] > 1, axis=1)
-    abs_grouped = dataframe.loc[out_of_scale_mask, :].abs().groupby("video")
-    repetitions = abs_grouped.size().to_numpy()
-    max_per_video = abs_grouped[xy_columns].max().max(axis=1).to_numpy()
-    max_per_video_repeated = max_per_video.repeat(repetitions)[:, None]
-    dataframe.loc[out_of_scale_mask, xy_columns] = \
-        dataframe.loc[out_of_scale_mask, xy_columns] / max_per_video_repeated
-
-    return dataframe
-
-
-def filter_dataframe_by_video_ids(dataframe, video_ids):
-    mask = dataframe["video"].isin(video_ids)
-    return dataframe.loc[mask, :]
-
-
 class PadIfLessThan(tf.keras.layers.Layer):
     def __init__(self, frames=128, **kwargs):
         super().__init__(**kwargs)
@@ -303,41 +178,30 @@ class ScaleTo01(tf.keras.layers.Layer):
 
     @tf.function
     def call(self, batch):
+        # shape = [examples, frames, joints]
         [red, green, blue] = tf.unstack(batch, axis=-1)
 
-        red_min = tf.reduce_min(red)
-        green_min = tf.reduce_min(green)
+        # shape = [examples, frames, joints]
+        red_min = tf.reduce_min(red, axis=[-1, -2], keepdims=True)
+        green_min = tf.reduce_min(green, axis=[-1, -2], keepdims=True)
 
+        # shape = [examples, 1, 1]
         red_offset = tf.cond(red_min < 0, red_min, 0)
         green_offset = tf.cond(green_min < 0, green_min, 0)
 
+        # shape = [examples, frames, joints]
         new_red = red - red_offset
         new_green = green - green_offset
 
-        scale_factor = tf.reduce_max([new_red, new_green])
+        # shape = [examples, 1, 1]
+        red_factor = tf.reduce_max(new_red, axis=[-1, -2], keepdims=True)
+        green_factor = tf.reduce_max(new_green, axis=[-1, -2], keepdims=True)
 
+        # shape = (1)
+        scale_factor = tf.reduce_max([red_factor, green_factor])
+
+        # shape = [examples, frames, joints]
         new_red = new_red / scale_factor
         new_green = new_green / scale_factor
 
         return tf.stack([new_red, new_green, blue], axis=-1)
-
-
-class MinMaxScaler(tf.keras.layers.Layer):
-    def __init__(self, data_min=0, data_max=100,
-                 range_min=0, range_max=1, **kwargs):
-        super().__init__(**kwargs)
-        self.data_min = data_min
-        self.data_max = data_max
-        self.range_min = range_min
-        self.range_max = range_max
-
-    @tf.function
-    def adapt(self, data):
-        self.data_min = tf.reduce_min(data)
-        self.data_max = tf.reduce_max(data)
-
-    @tf.function
-    def call(self, batch):
-        std = (batch - self.data_min) / (self.data_max - self.data_min)
-        scaled = std * (self.range_max - self.range_min) + self.range_min
-        return scaled

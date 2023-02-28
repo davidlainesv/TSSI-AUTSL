@@ -94,20 +94,21 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
               callbacks=callbacks)
 
     # train for a few more epochs
-    extra_epochs = 10
-    step_size = np.ceil(dataset.num_train_examples /
-                        config["batch_size"]) * extra_epochs
-    optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
-                                    maximal_learning_rate=config['initial_learning_rate'],
-                                    momentum=config['momentum'],
-                                    nesterov=config['nesterov'],
-                                    step_size=step_size,
-                                    weight_decay=config['weight_decay'])
-    model.fit(train_dataset,
-              epochs=extra_epochs,
-              verbose=verbose,
-              validation_data=validation_dataset,
-              callbacks=callbacks)
+    if config["extra_epochs"]:
+        extra_epochs = 10
+        step_size = np.ceil(dataset.num_train_examples /
+                            config["batch_size"]) * extra_epochs
+        optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
+                                        maximal_learning_rate=config['initial_learning_rate'] / 10,
+                                        momentum=config['momentum'],
+                                        nesterov=config['nesterov'],
+                                        step_size=step_size,
+                                        weight_decay=config['weight_decay'])
+        model.fit(train_dataset,
+                  epochs=extra_epochs,
+                  verbose=verbose,
+                  validation_data=validation_dataset,
+                  callbacks=callbacks)
 
     # get the logs of the model
     return model.history
@@ -135,6 +136,7 @@ def main(args):
     batch_size = args.batch_size
     num_epochs = args.num_epochs
     pipeline = args.pipeline
+    extra_epochs = args.extra_epochs
 
     dataset = Dataset()
 
@@ -155,7 +157,9 @@ def main(args):
         'num_epochs': num_epochs,
         'augmentation': augmentation,
         'batch_size': batch_size,
-        'pipeline': pipeline
+
+        'pipeline': pipeline,
+        'extra_epochs': extra_epochs
     }
 
     agent_fn(config=config, project=project, entity=entity, verbose=2)
@@ -188,6 +192,8 @@ if __name__ == "__main__":
                         help='Number of epochs', default=100)
     parser.add_argument('--pipeline', type=str,
                         help='Pipeline', default="default")
+    parser.add_argument('--extra_epochs', type=str2bool,
+                        help='Extra epochs', default=False)
     args = parser.parse_args()
 
     print(args)

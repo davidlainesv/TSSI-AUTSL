@@ -2,8 +2,16 @@ from enum import IntEnum
 import tensorflow as tf
 from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT, NUM_CLASSES
 from data_augmentation import RandomFlip, RandomScale, RandomShift, RandomRotation, RandomSpeed
-from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, ScaleSequenceTo01, TranslationScaleInvariant
+from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, ScaleTo01, TranslationScaleInvariant, MinMaxScaler
 import tensorflow_datasets as tfds
+
+AugmentationDict = {
+    'speed': RandomSpeed(min_frames=20, max_frames=MIN_INPUT_HEIGHT, seed=5),
+    'rotation': RandomRotation(factor=15.0, min_value=0.0, max_value=1.0, seed=4),
+    'flip': RandomFlip("horizontal", min_value=0.0, max_value=1.0, seed=3),
+    'scale': RandomScale(min_value=0.0, max_value=1.0, seed=1),
+    'shift': RandomShift(min_value=0.0, max_value=1.0, seed=2)
+}
 
 
 class LayerType(IntEnum):
@@ -74,38 +82,71 @@ LayerDict = {
                                                mean=[248.08896, 246.56985, 0.],
                                                variance=[9022.948, 17438.518, 0.])
     },
-    'scale_to_01': {
+    'scale_per_frame': {
         'type': LayerType.Normalization,
-        'layer': ScaleSequenceTo01()
+        'layer': ScaleTo01()
+    },
+    # placeholder for layer, max and min are obtained dinamically
+    'scale': {
+        'type': LayerType.Normalization,
+        'layer': MinMaxScaler(data_max=620., data_min=-75.,
+                              range_max=1, range_min=0)
     }
 }
 
 
-# Augmentation Order = ['speed', 'rotation', 'flip', 'scale', 'shift']
+NormalizationDict = {
+    'invariant_frame': TranslationScaleInvariant(level="frame"),
+    'invariant_joint': TranslationScaleInvariant(level="joint"),
+    'center': Center(around_index=0),
+    'train_resize': ResizeIfMoreThan(frames=MIN_INPUT_HEIGHT),
+    'test_resize': ResizeIfMoreThan(frames=MAX_INPUT_HEIGHT),
+    'pad': PadIfLessThan(frames=MIN_INPUT_HEIGHT),
+    'angle': FillBlueWithAngle(x_channel=0, y_channel=1, scale_to=[0, 1]),
+    'norm_imagenet': tf.keras.layers.Normalization(axis=-1,
+                                                   mean=[0.485, 0.456, 0.406],
+                                                   variance=[0.052441, 0.050176, 0.050625]),
+    # placeholder for norm, mean and variance are obtained dinamically
+    'norm': tf.keras.layers.Normalization(axis=-1,
+                                          mean=[248.08896, 246.56985, 0.],
+                                          variance=[9022.948, 17438.518, 0.])
+}
+
+# default_augmentation_order = ['speed', 'rotation', 'flip', 'scale', 'shift']
 PipelineDict = {
     'default': {
-        'train': ['random_speed', 'train_resize', 'pad'],
+        'train': ['random_speed', 'random_flip', 'random_scale', 'train_resize', 'pad'],
         'test': ['test_resize', 'pad']
     },
     'default_center': {
-        'train': ['center', 'random_speed', 'train_resize', 'pad'],
-        'test': ['center', 'test_resize', 'pad']
+        'augmentation': ['speed', 'rotation', 'flip', 'scale'],
+        'train': ['center', 'pad'],
+        'test': ['test_resize', 'center', 'pad']
     },
     'default_angle': {
-        'train': ['angle', 'random_speed', 'train_resize', 'pad'],
-        'test': ['angle', 'test_resize', 'pad']
+        'augmentation': ['speed', 'rotation', 'flip', 'scale', 'shift'],
+        'train': ['angle', 'pad'],
+        'test': ['test_resize', 'angle', 'pad']
     },
     'default_norm': {
-        'train': ['random_speed', 'train_resize', 'pad', 'norm'],
+        'augmentation': ['speed', 'flip', 'scale'],
+        'train': ['train_resize', 'pad', 'norm'],
         'test': ['test_resize', 'pad', 'norm']
     },
-    'default_scale_norm': {
-        'train': ['scale_to_01', 'random_speed', 'train_resize', 'pad', 'norm_imagenet'],
-        'test': ['scale_to_01', 'test_resize', 'pad', 'norm_imagenet']
-    },
     'invariant_frame': {
-        'train': ['random_speed', 'train_resize', 'invariant_frame', 'pad'],
+        'augmentation': ['speed', 'rotation', 'flip'],
+        'train': ['train_resize', 'invariant_frame', 'pad'],
         'test': ['test_resize', 'invariant_frame', 'pad']
+    },
+    'invariant_frame_center': {
+        'augmentation': ['speed', 'rotation', 'flip'],
+        'train': ['invariant_frame', 'center', 'pad'],
+        'test': ['test_resize', 'invariant_frame', 'center', 'pad']
+    },
+    'center_invariant_frame': {
+        'augmentation': ['speed', 'rotation', 'flip'],
+        'train': ['center', 'invariant_frame', 'pad'],
+        'test': ['test_resize', 'center', 'invariant_frame', 'pad']
     }
 }
 
