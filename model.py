@@ -17,14 +17,28 @@ import wandb
 def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
                             optimizer=None, pretraining=True):
     # setup model
-    weights = 'imagenet' if pretraining else None
+    # weights = 'imagenet' if pretraining else None
+    weights = None
     inputs = Input(shape=input_shape)
     # inputs = tf.keras.applications.mobilenet.preprocess_input(inputs)
     x = DenseNet121(input_shape=input_shape, weights=weights,
                     include_top=False, pooling='avg')(inputs)
     x = Dropout(dropout)(x)
-    predictions = Dense(NUM_CLASSES, activation='softmax')(x)
-    model = Model(inputs=inputs, outputs=predictions)
+
+    if pretraining:
+        path_to_downloaded_file = tf.keras.utils.get_file(
+            "tssi_densenet_wlasl100.zip",
+            "https://storage.googleapis.com/cloud-ai-platform-f3305919-42dc-47f1-82cf-4f1a3202db74/tssi_densenet_wlasl100.zip",
+            extract=True)
+        path_to_downloaded_file = path_to_downloaded_file.replace(".zip", "")
+        model = Model(inputs=inputs, outputs=x)
+        model.load_weights(path_to_downloaded_file + "/weights")
+        x = model.output
+        predictions = Dense(NUM_CLASSES, activation='softmax')(x)
+        model = Model(inputs=model.input, outputs=predictions)
+    else:
+        predictions = Dense(NUM_CLASSES, activation='softmax')(x)
+        model = Model(inputs=inputs, outputs=predictions)
 
     # setup the metrics
     metrics = [
@@ -34,14 +48,6 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
     # compile the model
     model.compile(optimizer=optimizer, loss='categorical_crossentropy',
                   metrics=metrics)
-
-    if pretraining:
-        path_to_downloaded_file = tf.keras.utils.get_file(
-            "tssi_densenet_wlasl100.zip",
-            "https://storage.googleapis.com/cloud-ai-platform-f3305919-42dc-47f1-82cf-4f1a3202db74/tssi_densenet_wlasl100.zip",
-            extract=True)
-        path_to_downloaded_file = path_to_downloaded_file.replace(".zip", "")
-        model.load_weights(path_to_downloaded_file + "/weights")
 
     return model
 
