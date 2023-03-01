@@ -31,9 +31,10 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
             "https://storage.googleapis.com/cloud-ai-platform-f3305919-42dc-47f1-82cf-4f1a3202db74/tssi_densenet_wlasl100.zip",
             extract=True)
         path_to_downloaded_file = path_to_downloaded_file.replace(".zip", "")
-        model = Model(inputs=inputs, outputs=x)
-        model.load_weights(path_to_downloaded_file + "/weights")
-        x = model.output
+        base_model = Model(inputs=inputs, outputs=x)
+        base_model.load_weights(path_to_downloaded_file + "/weights")
+        base_model.trainable = False
+        x = base_model(inputs, training=False)
         predictions = Dense(NUM_CLASSES, activation='softmax')(x)
         model = Model(inputs=model.input, outputs=predictions)
     else:
