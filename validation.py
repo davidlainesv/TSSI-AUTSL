@@ -97,19 +97,23 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     if base_model is not None:
         extra_epochs = 10
         base_model.trainable = True
-        # metrics = [tf.keras.metrics.TopKCategoricalAccuracy(
-        #     k=1, name='top_1', dtype=tf.float32)]
-        # model.compile(
-        #     optimizer=tf.keras.optimizers.Adam(1e-5),  # Low learning rate
-        #     loss='categorical_crossentropy',
-        #     metrics=metrics,
-        # )
-        optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
-                                        maximal_learning_rate=config['maximal_learning_rate'],
-                                        momentum=config['momentum'],
-                                        nesterov=config['nesterov'],
-                                        step_size=config['step_size'],
-                                        weight_decay=config['weight_decay'])
+        metrics = [tf.keras.metrics.TopKCategoricalAccuracy(
+            k=1, name='top_1', dtype=tf.float32)]
+
+        if config["last_optimizer"] == "adam":
+            optimizer = tf.keras.optimizers.Adam(1e-3)
+        else:
+            optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
+                                            maximal_learning_rate=config['maximal_learning_rate'],
+                                            momentum=config['momentum'],
+                                            nesterov=config['nesterov'],
+                                            step_size=config['step_size'],
+                                            weight_decay=config['weight_decay'])
+        model.compile(
+            optimizer=optimizer,
+            loss='categorical_crossentropy',
+            metrics=metrics,
+        )
         model.fit(train_dataset,
                   epochs=extra_epochs,
                   verbose=verbose,
@@ -166,6 +170,7 @@ def main(args):
 
         'pipeline': pipeline,
         # 'extra_epochs': extra_epochs
+        'last_optimizer': args.last_optimizer
     }
 
     agent_fn(config=config, project=project, entity=entity, verbose=2)
@@ -200,6 +205,8 @@ if __name__ == "__main__":
                         help='Pipeline', default="default")
     # parser.add_argument('--extra_epochs', type=str2bool,
     #                     help='Extra epochs', default=False)
+    parser.add_argument('--last_optimizer', type=str,
+                        help='Last optimizer', default='cyclical')
     args = parser.parse_args()
 
     print(args)
