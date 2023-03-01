@@ -11,6 +11,8 @@ from tensorflow.keras.applications.densenet import DenseNet121
 from tensorflow.keras.applications.nasnet import NASNetMobile
 # from tensorflow.keras.applications.efficientnet import EfficientNetB0
 
+import wandb
+
 
 def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
                             optimizer=None, pretraining=True):
@@ -32,6 +34,12 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
     # compile the model
     model.compile(optimizer=optimizer, loss='categorical_crossentropy',
                   metrics=metrics)
+
+    if pretraining:
+        run = wandb.init(project="testing", job_type="inference")
+        weights_at = run.use_artifact("run_so44q99f_model:v0")
+        weights_dir = weights_at.download()
+        model.load_weights(weights_dir + '/weights')
 
     return model
 
@@ -89,7 +97,7 @@ def build_efficientnet_model(input_shape=[None, 128, 3], dropout=0,
     inputs = Input(shape=input_shape)
     # inputs = tf.keras.layers.Resizing(128, 224)(inputs)
     x = EfficientNetB0(input_shape=input_shape, weights=weights,
-                     include_top=False, pooling="avg")(inputs)
+                       include_top=False, pooling="avg")(inputs)
     x = Dropout(dropout)(x)
     predictions = Dense(NUM_CLASSES, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
