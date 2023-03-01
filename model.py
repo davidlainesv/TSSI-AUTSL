@@ -36,10 +36,12 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
                   metrics=metrics)
 
     if pretraining:
-        run = wandb.init(project="testing", job_type="inference")
-        weights_at = run.use_artifact("run_so44q99f_model:v0")
-        weights_dir = weights_at.download()
-        model.load_weights(weights_dir + '/weights')
+        path_to_downloaded_file = tf.keras.utils.get_file(
+            "tssi_densenet_wlasl100.zip",
+            "https://storage.googleapis.com/cloud-ai-platform-f3305919-42dc-47f1-82cf-4f1a3202db74/tssi_densenet_wlasl100.zip",
+            untar=True)
+        path_to_downloaded_file = path_to_downloaded_file.replace(".zip", "")
+        model.load_weights(path_to_downloaded_file)
 
     return model
 
