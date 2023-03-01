@@ -97,7 +97,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     if base_model is not None:
         extra_epochs = 10
         base_model.trainable = True
-        metrics = [tensorflow.keras.metrics.TopKCategoricalAccuracy(
+        metrics = [tf.keras.metrics.TopKCategoricalAccuracy(
             k=1, name='top_1', dtype=tf.float32)]
         model.compile(
             optimizer=tf.keras.optimizers.Adam(1e-5),  # Low learning rate
