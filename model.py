@@ -20,10 +20,9 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
     # weights = 'imagenet' if pretraining else None
     weights = None
     inputs = Input(shape=input_shape)
-    # inputs = tf.keras.applications.mobilenet.preprocess_input(inputs)
     x = DenseNet121(input_shape=input_shape, weights=weights,
                     include_top=False, pooling='avg')(inputs)
-    x = Dropout(dropout)(x)
+    x = Dropout(0)(x)
 
     if pretraining:
         path_to_downloaded_file = tf.keras.utils.get_file(
@@ -35,8 +34,9 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
         base_model.load_weights(path_to_downloaded_file + "/weights")
         base_model.trainable = False
         x = base_model(inputs, training=False)
+        x = Dropout(dropout)(x)
         predictions = Dense(NUM_CLASSES, activation='softmax')(x)
-        model = Model(inputs=model.input, outputs=predictions)
+        model = Model(inputs=base_model.input, outputs=predictions)
     else:
         predictions = Dense(NUM_CLASSES, activation='softmax')(x)
         model = Model(inputs=inputs, outputs=predictions)
