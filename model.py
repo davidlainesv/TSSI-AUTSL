@@ -41,7 +41,7 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
             "https://storage.googleapis.com/cloud-ai-platform-f3305919-42dc-47f1-82cf-4f1a3202db74/tssi_densenet_wlasl100.zip",
             extract=True)
         path_to_downloaded_file = path_to_downloaded_file.replace(".zip", "")
-        model.load_weights(path_to_downloaded_file)
+        model.load_weights(path_to_downloaded_file + "/weights")
 
     return model
 
