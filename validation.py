@@ -94,7 +94,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
               callbacks=callbacks)
 
     # train for a few more epochs
-    if base_model is not None:
+    if base_model is not None and False:
         extra_epochs = 20
         base_model.trainable = True
         metrics = [tf.keras.metrics.TopKCategoricalAccuracy(

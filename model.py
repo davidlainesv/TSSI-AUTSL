@@ -34,7 +34,7 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
         path_to_downloaded_file = path_to_downloaded_file.replace(".zip", "")
         base_model = Model(inputs=inputs, outputs=x)
         base_model.load_weights(path_to_downloaded_file + "/weights")
-        base_model.trainable = False
+        # base_model.trainable = False
         x = base_model(inputs, training=False)
         x = Dropout(dropout)(x)
         predictions = Dense(NUM_CLASSES, activation='softmax')(x)
