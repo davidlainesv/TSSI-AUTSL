@@ -24,6 +24,8 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
                     include_top=False, pooling='avg')(inputs)
     x = Dropout(0)(x)
 
+    base_model = None
+
     if pretraining:
         path_to_downloaded_file = tf.keras.utils.get_file(
             "tssi_densenet_wlasl100.zip",
@@ -50,7 +52,7 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
     model.compile(optimizer=optimizer, loss='categorical_crossentropy',
                   metrics=metrics)
 
-    return model
+    return model, base_model
 
 
 def build_mobilenetv2_model(input_shape=[None, 128, 3], dropout=0,

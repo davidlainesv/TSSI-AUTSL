@@ -57,10 +57,10 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     # setup model
     input_shape = [None, dataset.input_width, 3]
     if config['backbone'] == "densenet":
-        model = build_densenet121_model(input_shape=input_shape,
-                                        dropout=config['dropout'],
-                                        optimizer=optimizer,
-                                        pretraining=config['pretraining'])
+        model, base_model = build_densenet121_model(input_shape=input_shape,
+                                                    dropout=config['dropout'],
+                                                    optimizer=optimizer,
+                                                    pretraining=config['pretraining'])
     elif config['backbone'] == "mobilenet":
         model = build_mobilenetv2_model(input_shape=input_shape,
                                         dropout=config['dropout'],
@@ -94,21 +94,21 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
               callbacks=callbacks)
 
     # train for a few more epochs
-    # if config["extra_epochs"]:
-    #     extra_epochs = 10
-    #     step_size = np.ceil(dataset.num_train_examples /
-    #                         config["batch_size"]) * extra_epochs
-    #     optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
-    #                                     maximal_learning_rate=config['initial_learning_rate'] / 10,
-    #                                     momentum=config['momentum'],
-    #                                     nesterov=config['nesterov'],
-    #                                     step_size=step_size,
-    #                                     weight_decay=config['weight_decay'])
-    #     model.fit(train_dataset,
-    #               epochs=extra_epochs,
-    #               verbose=verbose,
-    #               validation_data=validation_dataset,
-    #               callbacks=callbacks)
+    if base_model is not None:
+        extra_epochs = 10
+        base_model.trainable = True
+        metrics = [tensorflow.keras.metrics.TopKCategoricalAccuracy(
+            k=1, name='top_1', dtype=tf.float32)]
+        model.compile(
+            optimizer=tf.keras.optimizers.Adam(1e-5),  # Low learning rate
+            loss='categorical_crossentropy',
+            metrics=metrics,
+        )
+        model.fit(train_dataset,
+                  epochs=extra_epochs,
+                  verbose=verbose,
+                  validation_data=validation_dataset,
+                  callbacks=callbacks)
 
     # get the logs of the model
     return model.history
