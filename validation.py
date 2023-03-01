@@ -101,7 +101,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
             k=1, name='top_1', dtype=tf.float32)]
 
         if config["last_optimizer"] == "adam":
-            optimizer = tf.keras.optimizers.Adam(1e-3)
+            optimizer = tf.keras.optimizers.Adam(1e-2)
         else:
             optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
                                             maximal_learning_rate=config['maximal_learning_rate'],
