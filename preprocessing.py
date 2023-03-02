@@ -25,13 +25,9 @@ class PadIfLessThan(tf.keras.layers.Layer):
         self.frames = frames
 
     @tf.function
-    def tile(self, images):
-        height = tf.shape(images)[1]
-        reps = tf.math.ceil(self.frames / height)
-        shape = tf.constant([1,
-                             reps,
-                             1,
-                             1])
+    def tile(self, images, height):
+        reps = tf.cast(tf.math.ceil(self.frames / height), tf.int32)
+        shape = tf.constant([1, reps, 1, 1], tf.int32)
         images = tf.tile(images, shape)
         images = images[:, :self.frames, :, :]
         return images
@@ -40,7 +36,7 @@ class PadIfLessThan(tf.keras.layers.Layer):
     def call(self, images):
         height = tf.shape(images)[1]
         images = tf.cond(height < self.frames,
-                         lambda: self.tile(images),
+                         lambda: self.tile(images, height),
                          lambda: images)
         return images
 
