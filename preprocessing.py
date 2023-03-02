@@ -27,7 +27,11 @@ class PadIfLessThan(tf.keras.layers.Layer):
     @tf.function
     def tile(self, images):
         shape = tf.shape(images)
-        shape[1] = self.frames
+        shape = tf.constant([shape[0],
+                             self.frames,
+                             shape[2],
+                             shape[3],
+                             shape[4]])
         images = tf.tile(images, shape)
         return images
 
