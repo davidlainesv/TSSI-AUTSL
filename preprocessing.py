@@ -26,8 +26,8 @@ class PadIfLessThan(tf.keras.layers.Layer):
 
     # @tf.function
     def tile(self, images, height):
-        reps = int(np.ceil(self.frames / height))
-        shape = tf.constant([1, reps, 1, 1], tf.int32)
+        reps = int(tf.math.ceil(self.frames / height))
+        shape = tf.convert_to_tensor([1, reps, 1, 1], tf.int32)
         images = tf.tile(images, shape)
         images = images[:, :self.frames, :, :]
         return images
