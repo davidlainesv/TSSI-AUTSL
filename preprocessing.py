@@ -30,7 +30,7 @@ class PadIfLessThan(tf.keras.layers.Layer):
         shape = tf.constant([shape[0],
                              self.frames,
                              shape[2],
-                             shape[3])
+                             shape[3]])
         images = tf.tile(images, shape)
         return images
 
