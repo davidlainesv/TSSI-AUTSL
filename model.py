@@ -6,7 +6,7 @@ from tensorflow.keras.metrics import TopKCategoricalAccuracy
 from tensorflow.keras.layers import Dropout, Dense
 from tensorflow.keras import Input
 from tensorflow.keras.models import Model
-from tensorflow.keras.applications.densenet import DenseNet169 as DenseNet121
+from tensorflow.keras.applications.densenet import DenseNet121
 # from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 from tensorflow.keras.applications.nasnet import NASNetMobile
 # from tensorflow.keras.applications.efficientnet import EfficientNetB0
@@ -53,6 +53,30 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
                   metrics=metrics)
 
     return model, base_model
+
+
+def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
+                            optimizer=None, pretraining=True):
+    # setup model
+    weights = 'imagenet' if pretraining else None
+    inputs = Input(shape=input_shape)
+    x = DenseNet121(input_shape=input_shape, weights=weights,
+                    include_top=False, pooling='avg')(inputs)
+    x = Dropout(dropout)(x)
+    predictions = Dense(NUM_CLASSES, activation='softmax')(x)
+    model = Model(inputs=inputs, outputs=predictions)
+
+    # setup the metrics
+    metrics = [
+        TopKCategoricalAccuracy(k=1, name='top_1', dtype=tf.float32)
+    ]
+
+    # compile the model
+    model.compile(optimizer=optimizer, loss='categorical_crossentropy',
+                  metrics=metrics)
+
+    return model, None
+
 
 
 def build_mobilenetv2_model(input_shape=[None, 128, 3], dropout=0,
