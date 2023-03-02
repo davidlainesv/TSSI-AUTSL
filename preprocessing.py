@@ -19,28 +19,6 @@ class PadIfLessThan(tf.keras.layers.Layer):
         return padded_images
 
 
-class PadIfLessThan(tf.keras.layers.Layer):
-    def __init__(self, frames=128, **kwargs):
-        super().__init__(**kwargs)
-        self.frames = frames
-
-    # @tf.function
-    def tile(self, images, height):
-        reps = tf.math.ceil(self.frames / height)
-        shape = [1, reps, 1, 1]
-        images = tf.tile(images, shape)
-        images = images[:, :self.frames, :, :]
-        return images
-
-    @tf.function
-    def call(self, images):
-        height = tf.shape(images)[1]
-        images = tf.cond(height < self.frames,
-                         lambda: self.tile(images, height),
-                         lambda: images)
-        return images
-
-
 class ResizeIfMoreThan(tf.keras.layers.Layer):
     def __init__(self, frames=128, **kwargs):
         super().__init__(**kwargs)
