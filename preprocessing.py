@@ -38,8 +38,8 @@ class PadIfLessThan(tf.keras.layers.Layer):
     def call(self, images):
         height = tf.shape(images)[1]
         images = tf.cond(height < self.frames,
-                         self.tile(images),
-                         images)
+                         lambda: self.tile(images),
+                         lambda: images)
         return images
 
 
