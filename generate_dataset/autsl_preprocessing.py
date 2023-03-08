@@ -31,6 +31,7 @@ class Preprocessing:
         # pose = tensor.numpy()
         pose = self.reshape(pose)
         pose = self.fill_z_with_zeros(pose)
+        pose = self.normalize(pose)
         pose = self.add_root(pose)
         pose = self.sort_columns(pose)
         return pose
@@ -43,6 +44,14 @@ class Preprocessing:
         x, y, _ = tf.unstack(pose, axis=-1)
         z = tf.zeros(tf.shape(x))
         return tf.stack([x, y, z], axis=-1)
+    
+    def normalize(self, pose):
+        left = pose[:, self.left_wrist_idx, :]
+        right = pose[:, self.right_wrist_idx, :]
+        mid_chest = (left + right) / 2
+        mid_chest = mid_chest[:, tf.newaxis, :]
+        pose = tf.math.divide_no_nan(pose, mid_chest)
+        return pose
         
     def add_root(self, pose):
         left = pose[:, self.left_wrist_idx, :]
