@@ -44,7 +44,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
         pipeline=config['pipeline'])
 
     print("[INFO] Dataset Total examples:", dataset.num_total_examples)
-    print("[INFO] Dataset Training examples:", dataset.num_train_examples \
+    print("[INFO] Dataset Training examples:", dataset.num_train_examples
           + dataset.num_val_examples)
     print("[INFO] Dataset Testing examples:", dataset.num_test_examples)
 
@@ -60,9 +60,9 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     input_shape = [None, dataset.input_width, 3]
     if config['backbone'] == "densenet":
         model, _ = build_densenet121_model(input_shape=input_shape,
-                                        dropout=config['dropout'],
-                                        optimizer=optimizer,
-                                        pretraining=config['pretraining'])
+                                           dropout=config['dropout'],
+                                           optimizer=optimizer,
+                                           pretraining=config['pretraining'])
     elif config['backbone'] == "mobilenet":
         model = build_mobilenetv2_model(input_shape=input_shape,
                                         dropout=config['dropout'],
@@ -98,6 +98,26 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     # train model
     model.fit(train_dataset,
               epochs=config['num_epochs'],
+              verbose=verbose,
+              validation_data=validation_dataset,
+              callbacks=callbacks)
+
+    extra_epochs = 20
+    metrics = [tf.keras.metrics.TopKCategoricalAccuracy(
+        k=1, name='top_1', dtype=tf.float32)]
+    optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
+                                    maximal_learning_rate=config['initial_learning_rate'],
+                                    momentum=config['momentum'],
+                                    nesterov=config['nesterov'],
+                                    step_size=config['step_size'],
+                                    weight_decay=config['weight_decay'])
+    model.compile(
+        optimizer=optimizer,
+        loss='categorical_crossentropy',
+        metrics=metrics,
+    )
+    model.fit(train_dataset,
+              epochs=extra_epochs,
               verbose=verbose,
               validation_data=validation_dataset,
               callbacks=callbacks)
