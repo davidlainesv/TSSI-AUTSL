@@ -23,39 +23,51 @@ class Preprocessing:
             joints_idxs.append(idx)
         
         self.joints_idxs = joints_idxs
-        self.left_wrist_idx = self.range_dict["pose"][PoseLandmark.LEFT_SHOULDER]
-        self.right_wrist_idx = self.range_dict["pose"][PoseLandmark.RIGHT_SHOULDER]
+        self.left_shoulder_idx = self.range_dict["pose"][PoseLandmark.LEFT_SHOULDER]
+        self.right_shoulder_idx = self.range_dict["pose"][PoseLandmark.RIGHT_SHOULDER]
         self.root_idx = self.range_dict["root"][0]
         
     def __call__(self, pose):
-        # pose = tensor.numpy()
         pose = self.reshape(pose)
-        pose = self.fill_z_with_zeros(pose)
+        pose = self.fill_z_with_depth(pose)
         pose = self.normalize(pose)
         pose = self.add_root(pose)
         pose = self.sort_columns(pose)
         return pose
-        
+    
     def reshape(self, pose):
-        pose = pose[:, 0, :, :3]
+        pose = pose[:, 0, :, :]
         return pose
     
-    def fill_z_with_zeros(self, pose):
-        x, y, _ = tf.unstack(pose, axis=-1)
-        z = tf.zeros(tf.shape(x))
-        return tf.stack([x, y, z], axis=-1)
+    def fill_z_with_depth(self, pose):
+        x, y, _, depth = tf.unstack(pose, axis=-1)
+        return tf.stack([x, y, depth], axis=-1)
     
     def normalize(self, pose):
-        left = pose[:, self.left_wrist_idx, :]
-        right = pose[:, self.right_wrist_idx, :]
-        mid_chest = (left + right) / 2
-        mid_chest = mid_chest[:, tf.newaxis, :]
-        pose = tf.math.divide_no_nan(pose, mid_chest)
-        return pose
+        x, y, z = tf.unstack(pose, axis=-1)
+        
+#         x_left = x[:, self.left_shoulder_idx]
+#         x_right = x[:, self.right_shoulder_idx]
+#         x_mid_chest = (x_left + x_right) / 2
+#         x_mid_chest = x_mid_chest[:, tf.newaxis]
+#         x = x / x_mid_chest
+        
+#         y_left = y[:, self.left_shoulder_idx]
+#         y_right = y[:, self.right_shoulder_idx]
+#         y_mid_chest = (y_left + y_right) / 2
+#         y_mid_chest = y_mid_chest[:, tf.newaxis]
+#         y = y / y_mid_chest
+        
+        x = x / 512
+        y = y / 512
+        
+        z = z / 255
+        
+        return tf.stack([x, y, z], axis=-1)
         
     def add_root(self, pose):
-        left = pose[:, self.left_wrist_idx, :]
-        right = pose[:, self.right_wrist_idx, :]
+        left = pose[:, self.left_shoulder_idx, :]
+        right = pose[:, self.right_shoulder_idx, :]
         root = (left + right) / 2
         root = root[:, tf.newaxis, :]
         pose = tf.concat([pose, root], axis=1)
