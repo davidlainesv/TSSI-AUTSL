@@ -84,7 +84,7 @@ LayerDict = {
 # Augmentation Order = ['speed', 'rotation', 'flip', 'scale', 'shift']
 PipelineDict = {
     'default': {
-        'train': ['random_speed', 'train_resize', 'pad'],
+        'train': ['random_speed', 'random_scale', 'random_shift', 'random_rotation', 'train_resize', 'pad'],
         'test': ['test_resize', 'pad']
     },
     'default_center': {
