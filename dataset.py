@@ -2,7 +2,7 @@ from enum import IntEnum
 import tensorflow as tf
 from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT, NUM_CLASSES
 from data_augmentation import RandomFlip, RandomScale, RandomShift, RandomRotation, RandomSpeed
-from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, ScaleTo01, TranslationScaleInvariant
+from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, TranslationScaleInvariant
 import tensorflow_datasets as tfds
 
 
@@ -73,10 +73,6 @@ LayerDict = {
         'layer': tf.keras.layers.Normalization(axis=-1,
                                                mean=[248.08896, 246.56985, 0.],
                                                variance=[9022.948, 17438.518, 0.])
-    },
-    'scale_to_01': {
-        'type': LayerType.Normalization,
-        'layer': ScaleTo01()
     }
 }
 
@@ -98,10 +94,6 @@ PipelineDict = {
     'default_norm': {
         'train': ['random_speed', 'train_resize', 'pad', 'norm'],
         'test': ['test_resize', 'pad', 'norm']
-    },
-    'default_scale_norm': {
-        'train': ['scale_to_01', 'random_speed', 'train_resize', 'pad', 'norm_imagenet'],
-        'test': ['scale_to_01', 'test_resize', 'pad', 'norm_imagenet']
     },
     'invariant_frame': {
         'train': ['random_speed', 'train_resize', 'invariant_frame', 'pad'],

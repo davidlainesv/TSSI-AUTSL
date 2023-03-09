@@ -170,39 +170,3 @@ class FillBlueWithAngle(tf.keras.layers.Layer):
         scaled = std * (range_max - range_min) + range_min
 
         return tf.stack([x, y, scaled], axis=-1)
-
-
-class ScaleTo01(tf.keras.layers.Layer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    @tf.function
-    def call(self, batch):
-        # shape = [examples, frames, joints]
-        [red, green, blue] = tf.unstack(batch, axis=-1)
-
-        # shape = [examples, 1, 1]
-        red_min = tf.reduce_min(red, axis=[-1, -2], keepdims=True)
-        green_min = tf.reduce_min(green, axis=[-1, -2], keepdims=True)
-
-        # shape = [examples, frames, joints]
-        red_shifted = tf.cond(red_min < 0,
-                              lambda: red - red_min,
-                              lambda: red)
-        green_shifted = tf.cond(green_min < 0,
-                                lambda: green - green_min,
-                                lambda: green)
-
-        # shape = [examples, 1, 1]
-        red_factor = tf.reduce_max(red_shifted, axis=[-1, -2], keepdims=True)
-        green_factor = tf.reduce_max(
-            green_shifted, axis=[-1, -2], keepdims=True)
-
-        # shape = (1)
-        scale_factor = tf.reduce_max([red_factor, green_factor])
-
-        # shape = [examples, frames, joints]
-        new_red = red_shifted / scale_factor
-        new_green = green_shifted / scale_factor
-
-        return tf.stack([new_red, new_green, blue], axis=-1)
