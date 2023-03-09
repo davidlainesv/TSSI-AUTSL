@@ -6,7 +6,7 @@ from tensorflow.keras.metrics import TopKCategoricalAccuracy
 from tensorflow.keras.layers import Dropout, Dense
 from tensorflow.keras import Input
 from tensorflow.keras.models import Model
-from tensorflow.keras.applications.densenet import DenseNet169 as DenseNet121
+from tensorflow.keras.applications.densenet import DenseNet121
 # from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 from tensorflow.keras.applications.nasnet import NASNetMobile
 # from tensorflow.keras.applications.efficientnet import EfficientNetB0
@@ -76,7 +76,6 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
                   metrics=metrics)
 
     return model, None
-
 
 
 def build_mobilenetv2_model(input_shape=[None, 128, 3], dropout=0,

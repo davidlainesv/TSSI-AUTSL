@@ -103,13 +103,16 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
               callbacks=callbacks)
 
     extra_epochs = 10
+    steps_per_epoch = np.ceil(
+        dataset.num_train_examples / config["batch_size"])
+    new_step_size = extra_epochs * steps_per_epoch
     metrics = [tf.keras.metrics.TopKCategoricalAccuracy(
         k=1, name='top_1', dtype=tf.float32)]
     optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
                                     maximal_learning_rate=config['initial_learning_rate'] / 10,
                                     momentum=config['momentum'],
                                     nesterov=config['nesterov'],
-                                    step_size=config['step_size'],
+                                    step_size=new_step_size,
                                     weight_decay=config['weight_decay'])
     model.compile(
         optimizer=optimizer,
