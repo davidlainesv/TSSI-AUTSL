@@ -106,7 +106,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     metrics = [tf.keras.metrics.TopKCategoricalAccuracy(
         k=1, name='top_1', dtype=tf.float32)]
     optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
-                                    maximal_learning_rate=config['initial_learning_rate'],
+                                    maximal_learning_rate=config['initial_learning_rate'] / 10,
                                     momentum=config['momentum'],
                                     nesterov=config['nesterov'],
                                     step_size=config['step_size'],
