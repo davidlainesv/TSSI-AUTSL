@@ -102,7 +102,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
               validation_data=validation_dataset,
               callbacks=callbacks)
 
-    extra_epochs = 20
+    extra_epochs = 10
     metrics = [tf.keras.metrics.TopKCategoricalAccuracy(
         k=1, name='top_1', dtype=tf.float32)]
     optimizer = build_sgd_optimizer(initial_learning_rate=config['initial_learning_rate'],
