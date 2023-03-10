@@ -151,7 +151,7 @@ def main(args):
     batch_size = args.batch_size
     num_epochs = args.num_epochs
     pipeline = args.pipeline
-    save_freq = args.save_freq
+    save_freq = args.save_freq or num_epochs
 
     dataset = Dataset(concat_validation_to_train=True)
 
@@ -208,7 +208,7 @@ if __name__ == "__main__":
     parser.add_argument('--pipeline', type=str,
                         help='Pipeline', default="default")
     parser.add_argument('--save_freq', type=int,
-                        help='Save weights at epoch', default=100)
+                        help='Save weights at epoch')
     args = parser.parse_args()
 
     print(args)
