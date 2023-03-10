@@ -17,21 +17,18 @@ import wandb
 def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
                             optimizer=None, pretraining=True):
     # setup model
-    # weights = 'imagenet' if pretraining else None
-    weights = None
-    inputs = Input(shape=input_shape)
-    x = DenseNet121(input_shape=input_shape, weights=weights,
-                    include_top=False, pooling='avg')(inputs)
-    x = Dropout(0)(x)
-
     base_model = None
-
     if pretraining:
         path_to_downloaded_file = tf.keras.utils.get_file(
             "tssi_densenet_wlasl100.zip",
             "https://storage.googleapis.com/cloud-ai-platform-f3305919-42dc-47f1-82cf-4f1a3202db74/tssi_densenet_wlasl100.zip",
             extract=True)
         path_to_downloaded_file = path_to_downloaded_file.replace(".zip", "")
+
+        inputs = Input(shape=input_shape)
+        x = DenseNet121(input_shape=input_shape, weights=None,
+                        include_top=False, pooling='avg')(inputs)
+        x = Dropout(0)(x)
         base_model = Model(inputs=inputs, outputs=x)
         base_model.load_weights(path_to_downloaded_file + "/weights")
         # base_model.trainable = False
@@ -40,6 +37,10 @@ def build_densenet121_model(input_shape=[None, 128, 3], dropout=0,
         predictions = Dense(NUM_CLASSES, activation='softmax')(x)
         model = Model(inputs=base_model.input, outputs=predictions)
     else:
+        inputs = Input(shape=input_shape)
+        x = DenseNet121(input_shape=input_shape, weights=None,
+                        include_top=False, pooling='avg')(inputs)
+        x = Dropout(dropout)(x)
         predictions = Dense(NUM_CLASSES, activation='softmax')(x)
         model = Model(inputs=inputs, outputs=predictions)
 
