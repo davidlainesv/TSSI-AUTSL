@@ -109,7 +109,7 @@ PipelineDict = {
 @tf.function
 def label_to_one_hot(item):
     pose = item["pose"]
-    label = item["gloss_id"]
+    label = item["label"]
     one_hot_label = tf.one_hot(label, NUM_CLASSES)
     return pose, one_hot_label
 
