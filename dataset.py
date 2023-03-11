@@ -237,8 +237,8 @@ class Dataset():
         # define the train map function
         @tf.function
         def train_map_fn(x, y):
-            x = FillZWithZeros()(x)
             batch = tf.expand_dims(x, axis=0)
+            x = FillZWithZeros()(x)
             batch = preprocessing_pipeline(batch, training=True)
             x = tf.ensure_shape(
                 batch[0], [MIN_INPUT_HEIGHT, self.input_width, 3])
@@ -265,7 +265,7 @@ class Dataset():
         # define the val map function
         @tf.function
         def test_map_fn(batch_x, batch_y):
-            x = FillZWithZeros()(x)
+            batch_x = FillZWithZeros()(batch_x)
             batch_x = preprocessing_pipeline(batch_x)
             return batch_x, batch_y
 
@@ -287,7 +287,7 @@ class Dataset():
         # define the val map function
         @tf.function
         def test_map_fn(batch_x, batch_y):
-            x = FillZWithZeros()(x)
+            batch_x = FillZWithZeros()(batch_x)
             batch_x = preprocessing_pipeline(batch_x)
             return batch_x, batch_y
 
