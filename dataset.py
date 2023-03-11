@@ -2,7 +2,7 @@ from enum import IntEnum
 import tensorflow as tf
 from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT, NUM_CLASSES
 from data_augmentation import RandomFlip, RandomScale, RandomShift, RandomRotation, RandomSpeed
-from preprocessing import Center, FillBlueWithAngle, PadIfLessThan, ResizeIfMoreThan, TranslationScaleInvariant
+from preprocessing import Center, FillBlueWithAngle, FillZWithZeros, PadIfLessThan, ResizeIfMoreThan, TranslationScaleInvariant
 import tensorflow_datasets as tfds
 
 
@@ -237,6 +237,7 @@ class Dataset():
         # define the train map function
         @tf.function
         def train_map_fn(x, y):
+            x = FillZWithZeros()(x)
             batch = tf.expand_dims(x, axis=0)
             batch = preprocessing_pipeline(batch, training=True)
             x = tf.ensure_shape(
@@ -264,6 +265,7 @@ class Dataset():
         # define the val map function
         @tf.function
         def test_map_fn(batch_x, batch_y):
+            x = FillZWithZeros()(x)
             batch_x = preprocessing_pipeline(batch_x)
             return batch_x, batch_y
 
@@ -285,6 +287,7 @@ class Dataset():
         # define the val map function
         @tf.function
         def test_map_fn(batch_x, batch_y):
+            x = FillZWithZeros()(x)
             batch_x = preprocessing_pipeline(batch_x)
             return batch_x, batch_y
 

@@ -170,3 +170,14 @@ class FillBlueWithAngle(tf.keras.layers.Layer):
         scaled = std * (range_max - range_min) + range_min
 
         return tf.stack([x, y, scaled], axis=-1)
+
+
+class FillZWithZeros(tf.keras.layers.Layer):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    @tf.function
+    def call(self, batch):
+        [red, green, _] = tf.unstack(batch, axis=-1)
+        zeros = tf.zeros(tf.shape(red), dtype=red.dtype)
+        return tf.stack([red, green, zeros], axis=-1)
