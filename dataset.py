@@ -238,7 +238,7 @@ class Dataset():
         @tf.function
         def train_map_fn(x, y):
             batch = tf.expand_dims(x, axis=0)
-            x = FillZWithZeros()(x)
+            batch = FillZWithZeros()(batch)
             batch = preprocessing_pipeline(batch, training=True)
             x = tf.ensure_shape(
                 batch[0], [MIN_INPUT_HEIGHT, self.input_width, 3])
