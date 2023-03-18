@@ -23,8 +23,8 @@ class Preprocessing:
             joints_idxs.append(idx)
         
         self.joints_idxs = joints_idxs
-        self.left_shoulder_idx = self.range_dict["pose"][PoseLandmark.LEFT_SHOULDER]
-        self.right_shoulder_idx = self.range_dict["pose"][PoseLandmark.RIGHT_SHOULDER]
+        self.left_wrist_idx = self.range_dict["pose"][PoseLandmark.LEFT_WRIST]
+        self.right_wrist_idx = self.range_dict["pose"][PoseLandmark.RIGHT_WRIST]
         self.root_idx = self.range_dict["root"][0]
         
     def __call__(self, pose):
@@ -66,8 +66,8 @@ class Preprocessing:
         return tf.stack([x, y, z], axis=-1)
         
     def add_root(self, pose):
-        left = pose[:, self.left_shoulder_idx, :]
-        right = pose[:, self.right_shoulder_idx, :]
+        left = pose[:, self.left_wrist_idx, :]
+        right = pose[:, self.right_wrist_idx, :]
         root = (left + right) / 2
         root = root[:, tf.newaxis, :]
         pose = tf.concat([pose, root], axis=1)
