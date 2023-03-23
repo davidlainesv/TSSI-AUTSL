@@ -265,7 +265,7 @@ class Dataset():
         # define the val map function
         @tf.function
         def test_map_fn(batch_x, batch_y):
-            batch_x = FillZWithZeros()(batch_x)
+            batch_x = RemoveZ()(batch_x)
             batch_x = preprocessing_pipeline(batch_x)
             return batch_x, batch_y
 
