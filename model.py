@@ -1,7 +1,7 @@
 from config import NUM_CLASSES
 import tensorflow as tf
 from efficient_net_b0 import EfficientNetB0
-from densenet import DenseNet169 as DenseNet121
+from densenet import DenseNet121, DenseNet169, DenseNet201
 from loss import select_loss
 from tensorflow.keras.metrics import TopKCategoricalAccuracy
 from tensorflow.keras.layers import Dropout, Dense
@@ -17,14 +17,24 @@ def build_densenet121_model(input_shape=[None, 135, 2],
                             pretraining=True,
                             use_loss="crossentroypy",
                             growth_rate=12,
-                            attention=None):
+                            attention=None,
+                            densenet_depth=121):
     if pretraining and growth_rate != 32 and attention != None:
         raise Exception(
             "pretraining on ImageNet is also compatible to growth_rate=32 and attention=None")
 
     # setup backbone
     weights = 'imagenet' if pretraining else None
-    backbone = DenseNet121(input_shape=input_shape,
+    if densenet_depth == 121:
+        backbone_fn = DenseNet121
+    elif densenet_depth == 169:
+        backbone_fn = DenseNet169
+    elif densenet_depth == 201:
+        backbone_fn = DenseNet201
+    else:
+        raise Exception("DenseNet depth unknown")
+
+    backbone = backbone_fn(input_shape=input_shape,
                            weights=weights,
                            include_top=False,
                            pooling='avg',

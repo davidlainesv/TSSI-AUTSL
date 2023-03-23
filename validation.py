@@ -74,7 +74,8 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
                                         pretraining=config['pretraining'],
                                         use_loss=config['use_loss'],
                                         growth_rate=config['growth_rate'],
-                                        attention=config['use_attention'])
+                                        attention=config['use_attention'],
+                                        densenet_depth=config['densenet_depth'])
     elif config['backbone'] == "efficientnet":
         model = build_efficientnet_model(input_shape=input_shape,
                                          dropout=config['dropout'],
@@ -127,6 +128,7 @@ def main(args):
         'growth_rate': args.growth_rate,
         'use_attention': args.use_attention,
         'use_loss': args.use_loss,
+        'densenet_depth': args.densenet_depth,
 
         'optimizer': args.optimizer,
         'initial_learning_rate': args.lr_min,
@@ -168,6 +170,8 @@ if __name__ == "__main__":
                         default=None)
     parser.add_argument('--use_loss', type=str,
                         help='Loss function', default="crossentropy")
+    parser.add_argument('--densenet_depth', type=int,
+                        help='DenseNet depth', default=121)
 
     parser.add_argument('--optimizer', type=str,
                         help='Optimizer: \'sgd\', \'adam\'', default='sgd')
