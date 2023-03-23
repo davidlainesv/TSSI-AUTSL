@@ -204,10 +204,10 @@ class Dataset():
             ds["train"] = ds["train"].concatenate(ds["validation"])
 
         # generate norm layer
-        norm = tf.keras.layers.Normalization(axis=-2)
-        norm.adapt(ds["train"].map(extract_pose,
-                                   num_parallel_calls=tf.data.AUTOTUNE))
-        LayerDict["norm"]["layer"] = norm
+        # norm = tf.keras.layers.Normalization(axis=-2)
+        # norm.adapt(ds["train"].map(extract_pose,
+        #                            num_parallel_calls=tf.data.AUTOTUNE))
+        # LayerDict["norm"]["layer"] = norm
 
         # obtain characteristics of the dataset
         num_train_examples = ds["train"].cardinality()
