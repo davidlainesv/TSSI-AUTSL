@@ -1,7 +1,7 @@
 from config import NUM_CLASSES
 import tensorflow as tf
 from efficient_net_b0 import EfficientNetB0
-from densenet import DenseNet121
+from densenet import DenseNet169 as DenseNet121
 from loss import select_loss
 from tensorflow.keras.metrics import TopKCategoricalAccuracy
 from tensorflow.keras.layers import Dropout, Dense
