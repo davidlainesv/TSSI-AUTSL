@@ -152,7 +152,7 @@ if __name__ == "__main__":
     parser.add_argument('--entity', type=str,
                         help='Entity', default='davidlainesv')
     parser.add_argument('--project', type=str,
-                        help='Project name', default='popsign-validation')
+                        help='Project name', default='autsl-validation')
 
     parser.add_argument('--backbone', type=str,
                         help='Backbone method: \'densenet\', \'mobilenet\'',
