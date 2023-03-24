@@ -69,7 +69,9 @@ def bottleneck_layers(x, growth_rate, name, dropout=0):
     )(x)
     x1 = layers.Activation("relu", name=name + "_0_relu")(x1)
     x1 = layers.Conv2D(
-        4 * growth_rate, 1, use_bias=False, name=name + "_1_conv"
+         int(backend.int_shape(x)[bn_axis] * 0.5),
+        # 4 * growth_rate,
+        1, use_bias=False, name=name + "_1_conv"
     )(x1)
     x1 = layers.Dropout(dropout)(x1) if dropout else x1
     return x1
@@ -293,8 +295,8 @@ def DenseNet(
                     attention=None,
                     dropout=dropout)
 
-    x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name="bn")(x)
-    x = layers.Activation("relu", name="relu")(x)
+    # x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name="bn")(x)
+    # x = layers.Activation("relu", name="relu")(x)
 
     if include_top:
         x = layers.GlobalAveragePooling2D(name="avg_pool")(x)
