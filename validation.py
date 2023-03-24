@@ -6,7 +6,7 @@ import wandb
 from wandb.keras import WandbCallback
 import tensorflow as tf
 from model import build_densenet121_model, build_efficientnet_model
-from optimizer import build_sgd_optimizer, build_adam_optimizer
+from optimizer import build_sgd_optimizer, build_adam_optimizer, build_sgd_optimizer_wo_schedule
 from utils import str2bool
 
 dataset = None
@@ -65,6 +65,10 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
                                          step_size=config['step_size'],
                                          weight_decay=config['weight_decay'],
                                          epsilon=config['epsilon'])
+    elif config["optimizer"] == "sgd_wo_sd":
+        optimizer = build_sgd_optimizer_wo_schedule(initial_learning_rate=config['initial_learning_rate'],
+                                                    momentum=config['momentum'],
+                                                    nesterov=config['nesterov'],)
 
     # setup model
     if config['backbone'] == "densenet":
@@ -97,6 +101,11 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
             save_model=False
         )
         callbacks.append(wandb_callback)
+
+        if config["optimizer"] == "sgd_wo_sd":
+            reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+                monitor='val_loss', factor=0.1, patience=3, min_lr=0.001)
+            callbacks.append(reduce_lr)
 
     # train model
     model.fit(train_dataset,

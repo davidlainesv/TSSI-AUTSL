@@ -33,6 +33,7 @@ def build_sgd_optimizer(initial_learning_rate=0.001,
                         momentum=momentum, nesterov=nesterov)
     return optimizer
 
+
 def build_adam_optimizer(initial_learning_rate=0.001,
                          maximal_learning_rate=0.01,
                          step_size=50, epsilon=1e-7,
@@ -59,4 +60,12 @@ def build_adam_optimizer(initial_learning_rate=0.001,
     else:
         optimizer = Adam(learning_rate=learning_rate_schedule,
                          epsilon=epsilon)
+    return optimizer
+
+
+def build_sgd_optimizer_wo_schedule(initial_learning_rate=0.001,
+                                    momentum=0.0, nesterov=False):
+    # setup schedule
+    optimizer = SGD(learning_rate=initial_learning_rate,
+                    momentum=momentum, nesterov=nesterov)
     return optimizer
