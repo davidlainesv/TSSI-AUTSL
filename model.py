@@ -21,7 +21,7 @@ def build_densenet121_model(input_shape=[None, 135, 2],
                             densenet_depth=121):
     if pretraining and growth_rate != 32 and attention != None:
         raise Exception(
-            "pretraining on ImageNet is also compatible to growth_rate=32 and attention=None")
+            "pretraining on ImageNet is only compatible with growth_rate=32 and attention=None")
 
     # setup backbone
     weights = 'imagenet' if pretraining else None
@@ -39,12 +39,13 @@ def build_densenet121_model(input_shape=[None, 135, 2],
                            include_top=False,
                            pooling='avg',
                            growth_rate=growth_rate,
-                           attention=attention)
+                           attention=attention,
+                           dropout=dropout)
 
     # setup model
     inputs = Input(shape=input_shape)
     x = backbone(inputs)
-    x = Dropout(dropout)(x)
+    # x = Dropout(dropout)(x)
     predictions = Dense(NUM_CLASSES, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
 
