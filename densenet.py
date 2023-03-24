@@ -69,8 +69,8 @@ def bottleneck_layers(x, growth_rate, name, dropout=0):
     )(x)
     x1 = layers.Activation("relu", name=name + "_0_relu")(x1)
     x1 = layers.Conv2D(
-         int(backend.int_shape(x)[bn_axis] * 0.5),
-        # 4 * growth_rate,
+        #  int(backend.int_shape(x)[bn_axis] * 0.5),
+        4 * growth_rate,
         1, use_bias=False, name=name + "_1_conv"
     )(x1)
     x1 = layers.Dropout(dropout)(x1) if dropout else x1
