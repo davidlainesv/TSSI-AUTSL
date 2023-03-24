@@ -279,12 +279,12 @@ def DenseNet(
                         growth_rate=growth_rate,
                         name=f"conv{i+2}",
                         attention=None,
-                        dropout=dropout)
+                        dropout=0)
         x = transition_block(x,
                              reduction=0.5,
                              name=f"pool{i+2}",
                              attention=attention,
-                             dropout=dropout)
+                             dropout=0)
 
     # last block
     x = dense_block(x, blocks[3],
