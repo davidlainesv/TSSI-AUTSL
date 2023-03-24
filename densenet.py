@@ -269,7 +269,8 @@ def DenseNet(
     )(x)
     x = layers.Activation("relu", name="conv1/relu")(x)
     x = layers.ZeroPadding2D(padding=((1, 1), (1, 1)))(x)
-    x = layers.MaxPooling2D(3, strides=2, name="pool1")(x)
+    # x = layers.MaxPooling2D(3, strides=2, name="pool1")(x)
+    x = layers.AveragePooling2D(3, strides=2, name="pool1")(x)
 
     # 3 inner blocks
     for i in range(3):
