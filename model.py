@@ -47,6 +47,7 @@ def build_densenet121_model(input_shape=[None, 135, 2],
     x = backbone(inputs)
     # x = Dropout(dropout)(x)
     x = tf.keras.layers.Flatten()(x)
+    x = Dropout(0.3)(x) # not very confident eh!
     x = tf.keras.layers.Dense(1024, activation='relu')(x)
     predictions = Dense(NUM_CLASSES, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
