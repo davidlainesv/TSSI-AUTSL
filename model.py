@@ -45,7 +45,7 @@ def build_densenet121_model(input_shape=[None, 135, 2],
     # setup model
     inputs = Input(shape=input_shape)
     x = backbone(inputs)
-    x = Dropout(dropout)(x)
+    # x = Dropout(dropout)(x)
     predictions = Dense(NUM_CLASSES, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
 
