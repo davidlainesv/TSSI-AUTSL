@@ -66,7 +66,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
                                          weight_decay=config['weight_decay'],
                                          epsilon=config['epsilon'])
     elif config["optimizer"] == "sgd_wo_sd":
-        optimizer = build_sgd_optimizer_wo_schedule(initial_learning_rate=config['initial_learning_rate'],
+        optimizer = build_sgd_optimizer_wo_schedule(initial_learning_rate=config['maximal_learning_rate'],
                                                     momentum=config['momentum'],
                                                     nesterov=config['nesterov'],)
 
@@ -104,7 +104,10 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
 
         if config["optimizer"] == "sgd_wo_sd":
             reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
-                monitor='val_loss', factor=0.1, patience=3, min_lr=0.001)
+                monitor='val_loss',
+                factor=0.1,
+                patience=3,
+                min_lr=config['initial_learning_rate'])
             callbacks.append(reduce_lr)
 
     # train model
