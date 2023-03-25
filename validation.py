@@ -48,7 +48,7 @@ def run_experiment(config=None, log_to_wandb=True, verbose=0):
     print("[INFO] Dataset Validation examples:", dataset.num_val_examples)
 
     # describe input shape
-    input_shape = [None, dataset.input_width, 2]
+    input_shape = [60, dataset.input_width, 2]
     print("[INFO] Input Shape:", input_shape)
 
     # setup optimizer
