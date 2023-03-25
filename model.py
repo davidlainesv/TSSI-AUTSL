@@ -37,7 +37,7 @@ def build_densenet121_model(input_shape=[None, 135, 2],
     backbone = backbone_fn(input_shape=input_shape,
                            weights=weights,
                            include_top=False,
-                           pooling='avg',
+                           pooling=None,
                            growth_rate=growth_rate,
                            attention=attention,
                            dropout=dropout)
@@ -46,6 +46,8 @@ def build_densenet121_model(input_shape=[None, 135, 2],
     inputs = Input(shape=input_shape)
     x = backbone(inputs)
     # x = Dropout(dropout)(x)
+    x = tf.keras.layers.Reshape((1, -1, -1))(x)
+    x = tf.keras.layers.Dense(1024, activation='relu')(x)
     predictions = Dense(NUM_CLASSES, activation='softmax')(x)
     model = Model(inputs=inputs, outputs=predictions)
 
