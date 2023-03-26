@@ -86,8 +86,14 @@ class CenterAtFirstFrame2D(tf.keras.layers.Layer):
         red, green = tf.unstack(batch, axis=-1)
 
         # [color]_around_joint.shape => (examples)
-        red_around_joint_at_0 = red[:, 0, self.around_index]
-        green_around_joint_at_0 = green[:, 0, self.around_index]
+        red_around_joint_at_0 = tf.expand_dims(
+            tf.expand_dims(
+                red[:, 0, self.around_index], axis=-1),
+            axis=-1)
+        green_around_joint_at_0 = tf.expand_dims(
+            tf.expand_dims(
+                green[:, 0, self.around_index], axis=-1),
+            axis=-1)
 
         # new_[color].shape => (examples, frames, joints)
         new_red = red - red_around_joint_at_0
