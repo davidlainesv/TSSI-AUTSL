@@ -2,7 +2,7 @@ from enum import IntEnum
 import tensorflow as tf
 from config import MAX_INPUT_HEIGHT, MIN_INPUT_HEIGHT, NUM_CLASSES
 from data_augmentation import RandomFlip, RandomScale, RandomShift, RandomRotation, RandomSpeed
-from preprocessing import Center, FillBlueWithAngle, FillZWithZeros, PadIfLessThan, RemoveZ, ResizeIfMoreThan, TranslationScaleInvariant
+from preprocessing import Center, CenterAtFirstFrame2D, FillBlueWithAngle, FillZWithZeros, PadIfLessThan, RemoveZ, ResizeIfMoreThan, TranslationScaleInvariant
 import tensorflow_datasets as tfds
 
 
@@ -45,6 +45,10 @@ LayerDict = {
         'type': LayerType.Normalization,
         'layer': Center(around_index=0)
     },
+    'center_at_first': {
+        'type': LayerType.Normalization,
+        'layer': CenterAtFirstFrame2D(around_index=0)
+    },
     'train_resize': {
         'type': LayerType.Normalization,
         'layer': ResizeIfMoreThan(frames=MIN_INPUT_HEIGHT)
@@ -82,6 +86,10 @@ PipelineDict = {
     'default': {
         'train': ['random_speed', 'random_flip', 'random_scale', 'train_resize', 'pad'],
         'test': ['test_resize', 'pad']
+    },
+    'default_center_at_0': {
+        'train': ['random_speed', 'random_flip', 'random_scale', 'center_at_first', 'train_resize', 'pad'],
+        'test': ['center_at_first', 'test_resize', 'pad']
     },
     'default_center': {
         'train': ['center', 'random_speed', 'train_resize', 'pad'],

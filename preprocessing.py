@@ -74,6 +74,28 @@ class Center(tf.keras.layers.Layer):
         return tf.stack([new_red, new_green, blue], axis=-1)
 
 
+class CenterAtFirstFrame2D(tf.keras.layers.Layer):
+    def __init__(self, around_index=0, **kwargs):
+        super().__init__(**kwargs)
+        self.around_index = around_index
+
+    @tf.function
+    def call(self, batch):
+        # batch.shape => (examples, frames, joints, coordinates)
+        # [color].shape => (examples, frames, joints)
+        red, green = tf.unstack(batch, axis=-1)
+
+        # [color]_around_joint.shape => (examples)
+        red_around_joint_at_0 = red[:, 0, self.around_index]
+        green_around_joint_at_0 = green[:, :, self.around_index]
+
+        # new_[color].shape => (examples, frames, joints)
+        new_red = red - red_around_joint_at_0
+        new_green = green - green_around_joint_at_0
+
+        return tf.stack([new_red, new_green], axis=-1)
+
+
 class TranslationScaleInvariant(tf.keras.layers.Layer):
     def __init__(self, level='frame', **kwargs):
         super().__init__(**kwargs)
