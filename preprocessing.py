@@ -87,7 +87,7 @@ class CenterAtFirstFrame2D(tf.keras.layers.Layer):
 
         # [color]_around_joint.shape => (examples)
         red_around_joint_at_0 = red[:, 0, self.around_index]
-        green_around_joint_at_0 = green[:, :, self.around_index]
+        green_around_joint_at_0 = green[:, 0, self.around_index]
 
         # new_[color].shape => (examples, frames, joints)
         new_red = red - red_around_joint_at_0
