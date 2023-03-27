@@ -96,8 +96,8 @@ def conv_block(x, growth_rate, name, dropout=0):
         growth_rate, 3, padding="same", use_bias=False, name=name + "_2_conv"
     )(x1)
     # x1 = layers.Dropout(dropout)(x1) if dropout else x1
-    x1 = layers.SpatialDropout2D(dropout)(x1) if dropout else x1
     x = layers.Concatenate(axis=bn_axis, name=name + "_concat")([x, x1])
+    x = layers.SpatialDropout2D(dropout)(x) if dropout else x
     return x
 
 
