@@ -296,7 +296,7 @@ def DenseNet(
                     dropout=dropout)
 
     x = layers.BatchNormalization(axis=bn_axis, epsilon=1.001e-5, name="bn")(x)
-    x = layers.Activation("relu", name="relu")(x)
+    # x = layers.Activation("relu", name="relu")(x)
 
     if include_top:
         x = layers.GlobalAveragePooling2D(name="avg_pool")(x)
